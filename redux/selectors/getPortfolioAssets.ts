@@ -71,6 +71,7 @@ export const getPortfolioAssets = createSelector(
       .map((tokenId) => {
         const asset = assets.data[tokenId];
         const { isLpToken } = asset;
+        // const isLpToken = false;
         const collateral = shrinkToken(
           (isLpToken
             ? account.portfolio.positions[tokenId]?.collateral?.[tokenId]?.balance || 0

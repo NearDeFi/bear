@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTheme, Box, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import LogoIcon from "../../public/logo.svg";
+import LogoIcon from "../../public/btc.png";
 import BurrowIcon from "../../public/burrow.svg";
 import BrrrIcon from "../../public/brrr.svg";
 import WalletButton from "./WalletButton";
@@ -17,12 +17,13 @@ import { RefreshIcon } from "./svg";
 import { DiscordIcon, MediumIcon, TwitterIcon } from "../Footer/svg";
 import { LinksWrapper } from "../Footer/style";
 import { isMobileDevice } from "../../helpers/helpers";
+import { borderBottom } from "@mui/system";
 
 const MenuItem = ({ item }: { item: Imenu }) => {
   const { title, link, allLinks } = item;
   const router = useRouter();
   const isSelected = allLinks?.includes(router.route);
-  const style = isSelected ? { color: "#D2FF3A" } : {};
+  const style = isSelected ? { color: "white", borderBottom: "1px solid white" } : { opacity: 0.5 };
 
   return (
     <Link href={link}>
@@ -115,7 +116,7 @@ const Header = () => {
     <Box
       sx={{
         background: theme.custom.headerBackground,
-        mb: { xs: "1rem", sm: "2rem" },
+        // mb: { xs: "1rem", sm: "2rem" },
       }}
     >
       {/* pc */}
@@ -125,21 +126,25 @@ const Header = () => {
             onClick={() => {
               window.open("https://burrow.finance/");
             }}
+            className="m-4"
           >
-            <LogoIcon style={{ fill: "white" }} />
-            <BurrowIcon />
+            <img src="/svg/logo.svg" alt="" width="50px" />
+            {/* <LogoIcon style={{ fill: "white" }} /> */}
+            {/* <BurrowIcon /> */}
           </Logo>
-          <Menu>
-            {mainMenuList.map((item) => {
-              return <MenuItem key={item.title} item={item} />;
-            })}
-            <HelpMenuItem />
-            <CommunityItem />
-          </Menu>
-          <Box display="flex" justifyContent="flex-end" alignItems="stretch" className=" gap-4">
-            <Bridge />
+          {/* <div className="border border-blue-500 w-[100%]"> */}
+            <Menu className="flex w-[100%] justify-end mr-8">
+              {mainMenuList.map((item) => {
+                return <MenuItem key={item.title} item={item} />;
+              })}
+              {/* <HelpMenuItem /> */}
+              {/* <CommunityItem /> */}
+            </Menu>
+          {/* </div> */}
+          <Box display="flex" justifyContent="flex-end" alignItems="stretch" className="mt-2 gap-4">
+            {/* <Bridge /> */}
             <WalletButton />
-            <Set />
+            {/* <Set /> */}
           </Box>
           <Snackbar
             open={open}

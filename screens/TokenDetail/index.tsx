@@ -452,7 +452,7 @@ function DetailPc({ tokenDetails, handlePeriodClick }) {
   const { router, supplied, borrowed, tokenRow } = useContext(DetailData) as any;
 
   return (
-    <LayoutBox>
+    <LayoutBox className="px-12 pt-8 bg-[#14161F]">
       <div
         className="inline-flex items-center cursor-pointer mb-8"
         onClick={() => {
@@ -762,7 +762,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   const apy = format_apy(depositAPY);
 
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
       <div className="font-bold text-lg text-white mb-5">Supply Info</div>
       {/* only pc */}
       <div className="flex items-stretch xsm:hidden">
@@ -837,7 +837,7 @@ function TokenBorrowChart({ tokenDetails, handlePeriodClick }) {
   const value_value = toInternationalCurrencySystem_usd(tokenRow?.totalBorrowedMoney);
   const apy = format_apy(borrowAPY);
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
       <div className="font-bold text-lg text-white mb-5">Borrow Info</div>
       {/* only pc */}
       <div className="flex items-stretch xsm:hidden">
@@ -889,7 +889,7 @@ function TokenRateModeChart({
   // const { borrowRate, supplyRate } = fullRateDetail || {};
 
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
       <div className="font-bold text-lg text-white mb-5">Interest Rate Mode</div>
 
       <div className="grid grid-cols-1 gap-y-4 mb-6 hidden xsm2:block">
@@ -1484,7 +1484,7 @@ function OuterLink() {
 
 function Box({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`px-7 py-5 border border-dark-50 rounded-md bg-gray-800 ${className}`}>
+    <div className={`px-7 py-5 border border-dark-50 rounded-md bg-black ${className}`}>
       {children}
     </div>
   );
@@ -1499,7 +1499,7 @@ function UserBox({
 }) {
   return (
     <div
-      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-gray-800 ${className}`}
+      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-black ${className}`}
     >
       {children}
     </div>
@@ -1580,6 +1580,7 @@ function LabelMobile({
     </div>
   );
 }
+
 function LabelMobileAPY({ tokenRow, title }) {
   return (
     <div className="flex items-center justify-between">

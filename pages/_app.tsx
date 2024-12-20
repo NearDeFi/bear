@@ -128,8 +128,8 @@ function Upgrade({ Component, pageProps }) {
   return (
     <div>
       {upgrading ? (
-        <div className="flex flex-col items-center justify-center  h-screen">
-          <img src="/loading-brrr.gif" alt="" width="75px" />
+          <div className="flex flex-col items-center justify-center  h-screen">
+            <img src="/loading-brrr.gif" alt="" width="75px" />
           <span className="flex items-center text-sm text-gray-300 mt-2">
             Refreshing assets data...
           </span>
@@ -195,7 +195,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary fallback={FallbackError}>
       <LoadingBar
-        color="#D2FF3A"
+        color="#FF9900"
         height={3}
         progress={progress}
         onLoaderFinished={() => setProgress(0)}

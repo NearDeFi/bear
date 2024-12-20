@@ -20,7 +20,7 @@ import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
 
-export default function Action({ maxBorrowAmount, healthFactor, collateralType, poolAsset }) {
+export default function Action({ maxBorrowAmount, healthFactor, collateralType, poolAsset, onClose }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
   const { enable_pyth_oracle } = useAppSelector(getConfig);
@@ -181,6 +181,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
       disabled={actionDisabled}
       loading={loading}
       onClick={handleActionButtonClick}
+      onClose={onClose}
     />
   );
 }
