@@ -147,7 +147,7 @@ const Header = () => {
               {/* <CommunityItem /> */}
             </Menu>
           {/* </div> */}
-          <Box display="flex" justifyContent="flex-end" alignItems="stretch" className="mt-2 gap-4">
+          <Box display="flex" justifyContent="center" alignItems="stretch" className="gap-4 mr-4">
             {/* <Bridge /> */}
             <WalletButton />
             {/* <Set /> */}
