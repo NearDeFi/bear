@@ -273,10 +273,10 @@ export const SubmitButton = ({ action, disabled, onClick, loading, onClose }) =>
     return (
       <div className="flex items-center gap-2">
         <CancelButton onClick={onClose}>
-          {loading ? <BeatLoader size={5} color="#14162B" /> : "Cancel"}
+          {loading ? <BeatLoader size={5} color="#FF9900" /> : "Cancel"}
         </CancelButton>
         <RedSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
-          {loading ? <BeatLoader size={5} color="#14162B" /> : action}
+          {loading ? <BeatLoader size={5} color="#FF9900" /> : action}
         </RedSolidSubmitButton>
       </div>
     );
