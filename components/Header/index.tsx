@@ -17,7 +17,6 @@ import { RefreshIcon } from "./svg";
 import { DiscordIcon, MediumIcon, TwitterIcon } from "../Footer/svg";
 import { LinksWrapper } from "../Footer/style";
 import { isMobileDevice } from "../../helpers/helpers";
-// import { borderBottom } from "@mui/system";
 
 const MenuItem = ({ item }: { item: Imenu }) => {
   const { title, link, allLinks } = item;
