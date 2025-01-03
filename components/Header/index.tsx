@@ -148,22 +148,14 @@ const Header = () => {
                 fill="#FF9900"
               />
             </svg>
-            {/* <LogoIcon style={{ fill: "white" }} /> */}
-            {/* <BurrowIcon /> */}
           </Logo>
-          {/* <div className="border border-blue-500 w-[100%]"> */}
           <Menu className="flex w-full justify-end mr-8">
             {mainMenuList.map((item) => (
               <MenuItem key={item.title} item={item} />
             ))}
-            {/* <HelpMenuItem /> */}
-            {/* <CommunityItem /> */}
           </Menu>
-          {/* </div> */}
           <Box display="flex" justifyContent="center" alignItems="stretch" className="gap-4 mr-4">
-            {/* <Bridge /> */}
             <WalletButton />
-            {/* <Set /> */}
           </Box>
           <Snackbar
             open={open}
