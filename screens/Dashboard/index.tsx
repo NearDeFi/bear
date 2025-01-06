@@ -34,7 +34,7 @@ const Index = () => {
     overviewNode = <DashboardOverview suppliedRows={suppliedRows} borrowedRows={borrowedRows} />;
   } else {
     overviewNode = (
-      <div className="bg-gray-800 p-4 mb-4 rounded md:bg-transparent md:p-0 md:mb-0 md:flex justify-between items-center">
+      <div className="bg-gray-800 p-4 mb-4 rounded md:bg-transparent md:p-0 md:mb-0 md:flex justify-between items-center mt-10 border border-red-500">
         <div>
           <div className="h3 mb-2">Connect your wallet</div>
           <div className="mb-4 text-gray-300 h4">

@@ -129,7 +129,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
   const hasMultiHealths = userHealth?.allHealths?.length > 1 && userHealth?.hasBorrow;
   return (
     <>
-      <div className="flex gap-2 justify-between items-center mb-4 lg3:hidden">
+      <div className="flex gap-2 justify-between items-center mb-4 lg3:hidden mt-4">
         <div className="h2">Dashboard</div>
         <div className="flex gap-2">
           {liquidationButton}

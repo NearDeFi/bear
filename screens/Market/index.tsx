@@ -32,19 +32,16 @@ const Market = () => {
         <div className="w-full px-32 z-[1]">
           <p className="text-white text-2xl font-bold mb-5">Market</p>
           <MarketsTable
-            rows={rows.filter((row) => {
-              return true
-              // return row.symbol === "USDC" || row.symbol === "USDt" || row.symbol === "WBTC";
-            })}
+            rows={rows}
             onRowClick={handleOnRowClick}
             sorting={{ name: "market", ...sorting.market, setSorting }}
           />
-        {loading ? (
-          <div className="flex flex-col items-center mt-24">
-            <img src="/loading-brrr.gif" alt="" width="75px" />
-            <span className="flex items-center text-sm text-gray-300 mt-2">Loading data...</span>
-          </div>
-        ) : null}
+          {loading ? (
+            <div className="flex flex-col items-center mt-24">
+              <img src="/loading-brrr.gif" alt="" width="75px" />
+              <span className="flex items-center text-sm text-gray-300 mt-2">Loading data...</span>
+            </div>
+          ) : null}
         </div>
       </div>
     </LayoutBox>
