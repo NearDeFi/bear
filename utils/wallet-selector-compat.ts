@@ -203,12 +203,9 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       }) as any,
     ],
     network: {
-      networkId: "",
-      nodeUrl: "",
-      helperUrl: "",
-      explorerUrl: "",
-      indexerUrl: "",
-    },
+      networkId: defaultNetwork,
+      nodeUrl: RPC_LIST[endPoint].url,
+    } as Network,
     debug: !!isTestnet,
     optimizeWalletOrder: false,
   });
