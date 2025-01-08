@@ -1077,7 +1077,7 @@ function TokenUserInfo() {
             {tokenRow?.can_borrow && (
               <RedSolidButton
                 disabled={!+totalBorrowAmount}
-                className="w-1 flex-grow"
+                className="w-1 flex-grow text-black"
                 onClick={() => {
                   handleBorrowClick();
                   dispatch(updatePosition({ position: DEFAULT_POSITION }));
