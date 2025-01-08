@@ -2,18 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 @import "../node_modules/ref-modal-ui/styles.css";
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
 @font-face {
-  font-family: "work-sans";
-  src: url("./work-sans/WorkSans-Regular.otf");
+  font-family: 'Figtree', sans-serif !important;
+  src: url('/fonts/figtree-regular.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: "work-sans-bold";
-  src: url("./work-sans/WorkSans-Bold.otf");
+  font-family: 'Figtree', sans-serif !important;
+  src: url('/fonts/figtree-bold.woff2') format('woff2');
 }
 
 body {
-  font-family: "work-sans";
+  font-family: 'Figtree', sans-serif !important;
   margin: 0;
   padding: 0;
   height: 100%;

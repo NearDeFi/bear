@@ -37,7 +37,6 @@ export const Menu = styled("div")(({ theme }) => ({
 export const LinkStyled = styled(Link)(({ theme }) => ({
   color: "white",
   textDecoration: "none",
-  fontFamily: "work-sans",
   textAlign: "center",
   fontSize: "16px",
   lineHeight: 1.75,
