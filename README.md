@@ -1,4 +1,4 @@
-# Burrow.cash
+# Bear - Bitcoin Lending Protocol
 
 Update for deployment.
 
