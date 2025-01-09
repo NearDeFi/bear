@@ -1,8 +1,8 @@
 import Decimal from "decimal.js";
-
+import { executeBTCDepositAndAction } from "btc-wallet";
 import { decimalMin, getBurrow } from "../../utils";
 import { expandTokenDecimal } from "../helper";
-import { ChangeMethodsToken } from "../../interfaces";
+import { NBTCTokenId } from "../../utils/config";
 import { getTokenContract, getMetadata, prepareAndExecuteTokenTransactions } from "../tokens";
 import getBalance from "../../api/get-balance";
 
@@ -22,14 +22,16 @@ export async function supply({
   const { account, logicContract } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
-  const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
-
-  const expandedAmount = isMax
-    ? tokenBalance
-    : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
-
+  let expandedAmount;
+  if (tokenId === NBTCTokenId) {
+    expandedAmount = expandTokenDecimal(amount, decimals);
+  } else {
+    const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
+    expandedAmount = isMax
+      ? tokenBalance
+      : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
+  }
   const collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
-
   const collateralActions = {
     actions: [
       {
@@ -41,12 +43,20 @@ export async function supply({
     ],
   };
 
-  await prepareAndExecuteTokenTransactions(tokenContract, {
-    methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
-    args: {
+  // await prepareAndExecuteTokenTransactions(tokenContract, {
+  //   methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
+  //   args: {
+  //     receiver_id: logicContract.contractId,
+  //     amount: expandedAmount.toFixed(0),
+  //     msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
+  //   },
+  // });
+  await executeBTCDepositAndAction({
+    action: {
       receiver_id: logicContract.contractId,
       amount: expandedAmount.toFixed(0),
       msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
     },
+    isDev: true,
   });
 }

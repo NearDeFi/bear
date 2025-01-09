@@ -136,7 +136,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
           {recordsButton}
         </div>
       </div>
-      <ContentBox className="mb-8">
+      <ContentBox className="mb-8 mt-8">
         <div className="lg3:flex lg3:justify-between">
           <div className="mb-4 lg3:max-w-[640px] lg3:mb-0">
             <div className="flex gap-2 justify-between lg3:gap-6">

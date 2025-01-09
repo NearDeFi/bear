@@ -48,7 +48,7 @@ export const toInternationalCurrencySystem_usd = (v) => {
   } else if (decimal.lt(0.01)) {
     return "<$0.01";
   } else {
-    return `$${toInternationalCurrencySystem(decimal.toFixed())}`;
+    return `${toInternationalCurrencySystem(decimal.toFixed())}`;
   }
 };
 

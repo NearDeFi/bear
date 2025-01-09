@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import Decimal from "decimal.js";
+import { useBtcWalletSelector } from "btc-wallet";
 import { nearTokenId } from "../../utils";
 import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
 import { getModalData } from "./utils";
@@ -21,15 +22,14 @@ import { expandToken, shrinkToken } from "../../store";
 import { getAssets as getAssetSelector } from "../../redux/assetsSelectors";
 import { getAccountPortfolio, getAccountId } from "../../redux/accountSelectors";
 
-export default function Action({ maxBorrowAmount, healthFactor, collateralType, poolAsset }) {
+export default function Action({ maxBorrowAmount, healthFactor, collateralType, poolAsset, onClose }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
   const { enable_pyth_oracle } = useAppSelector(getConfig);
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
-  const assets = useAppSelector(getAssetSelector);
-  const accountPortfolio = useAppSelector(getAccountPortfolio);
-  const accountId = useAppSelector(getAccountId);
+  const { account, autoConnect } = useBtcWalletSelector();
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
   const { available, canUseAsCollateral, extraDecimals, collateral, disabled, decimals } =
@@ -51,6 +51,10 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   }, [useAsCollateral]);
 
   const handleActionButtonClick = async () => {
+    if (!account && selectedWalletId === "btc-wallet") {
+      autoConnect();
+      return;
+    }
     setLoading(true);
     trackActionButton(action, {
       tokenId,
@@ -182,6 +186,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
       disabled={actionDisabled}
       loading={loading}
       onClick={handleActionButtonClick}
+      onClose={onClose}
     />
   );
 }

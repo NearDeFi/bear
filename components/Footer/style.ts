@@ -29,7 +29,7 @@ export const CopyWrapper = styled("div")(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
     justifyContent: "space-around",
     gridRow: 2,
-    marginBottom: theme.spacing(3),
+    marginBottom: "40px",
   },
   [theme.breakpoints.up("sm")]: {
     gap: "1rem",

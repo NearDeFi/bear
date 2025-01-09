@@ -21,13 +21,22 @@ import {
   formatWithCommas_usd,
 } from "../../utils/uiNumber";
 import { APYCell } from "./APYCell";
-import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
+import getConfig, { incentiveTokens, topTokens, NBTCTokenId } from "../../utils/config";
 
 function MarketsTable({ rows, sorting }: TableProps) {
+  const allowedTokenIds = [
+    "wbtc.ft.ref-labs.testnet",
+    NBTCTokenId,
+    "eth.ft.ref-labs.testnet",
+    "usdcc.ft.ref-labs.testnet",
+    "usdtt.ft.ref-labs.testnet",
+    "frax.ft.ref-labs.testnet",
+  ];
+  const filteredRows = rows.filter((row) => allowedTokenIds.includes(row.tokenId));
   return (
     <div className="w-full xsm:p-4">
       <TableHead sorting={sorting} />
-      <TableBody rows={rows} sorting={sorting} />
+      <TableBody rows={filteredRows} sorting={sorting} />
     </div>
   );
 }
@@ -49,12 +58,21 @@ function TableHead({ sorting }) {
   if (isMobile) return <HeadMobile sorting={sorting} />;
   return (
     <div className="grid grid-cols-6 h-12">
-      <div className="col-span-1 border border-dark-50 bg-gray-800 rounded-t-2xl flex items-center pl-5 text-sm text-gray-300">
-        Market
+      <div className="col-span-1 rounded-t-2xl flex items-center text-sm text-gray-300">
+        Asset
       </div>
-      <div className="grid grid-cols-2 col-span-2 bg-primary rounded-t-2xl items-center text-sm text-black">
+      <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-black">
+
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          onClick={() => {
+            dispatch_sort_action("depositApy");
+          }}
+        >
+          {/* Supply APY <SortButton sort={getCurColumnSort("depositApy")} /> */}
+        </div>
+        <div
+          className="col-span-1 flex text-gray-300 items-center cursor-pointer whitespace-nowrap"
           onClick={() => {
             dispatch_sort_action("totalSupplyMoney");
           }}
@@ -62,16 +80,8 @@ function TableHead({ sorting }) {
           Total Supplied
           <SortButton sort={getCurColumnSort("totalSupplyMoney")} />
         </div>
-        <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
-          onClick={() => {
-            dispatch_sort_action("depositApy");
-          }}
-        >
-          Supply APY <SortButton sort={getCurColumnSort("depositApy")} />
-        </div>
       </div>
-      <div className="grid grid-cols-2 col-span-2 bg-red-50 rounded-t-2xl items-center text-sm text-black">
+      <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-gray-300">
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
           onClick={() => {
@@ -90,7 +100,7 @@ function TableHead({ sorting }) {
         </div>
       </div>
       <div
-        className="col-span-1 bg-gray-300 rounded-t-2xl flex items-center text-sm text-black cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
+        className="col-span-1 rounded-t-2xl flex items-center text-sm text-gray-300 cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
         onClick={() => {
           dispatch_sort_action("availableLiquidityMoney");
         }}
@@ -391,7 +401,7 @@ function TableRowPc({
   return (
     <Link key={row.tokenId} href={`/tokenDetail/${row.tokenId}`}>
       <div
-        className={`grid grid-cols-6 bg-gray-800 hover:bg-dark-100 cursor-pointer mt-0.5 h-[60px] ${
+        className={`grid grid-cols-6 hover:bg-black hover:border hover:border-primary rounded-md cursor-pointer mt-0.5 h-[60px] ${
           lastRow ? "rounded-b-md" : ""
         }`}
       >
@@ -410,21 +420,12 @@ function TableRowPc({
           ) : null}
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
-          {row.can_deposit ? (
-            <>
-              <span className="text-sm text-white">
-                {toInternationalCurrencySystem_number(row.totalSupply)}
-              </span>
-              <span className="text-xs text-gray-300">
-                {toInternationalCurrencySystem_usd(row.totalSupplyMoney)}
-              </span>
-            </>
-          ) : (
-            <>-</>
-          )}
+          {/* <span className="text-sm text-white">
+            {toInternationalCurrencySystem_number(row.totalSupply)}
+          </span> */}
         </div>
-        <div className="col-span-1 flex flex-col justify-center pl-3 xl:pl-7 whitespace-nowrap">
-          <span className="flex items-center gap-2 text-sm text-white">
+        <div className="col-span-1 flex flex-col justify-center whitespace-nowrap">
+          {/* <span className="flex items-center gap-2 text-sm text-white">
             {row.can_deposit ? (
               <APYCell
                 rewards={row.depositRewards}
@@ -437,7 +438,19 @@ function TableRowPc({
               "-"
             )}
             {incentiveTokens.includes(row.tokenId) ? <BoosterTag /> : null}
-          </span>
+          </span> */}
+          {row.can_deposit ? (
+            <>
+              <span className="text-sm text-white">
+                {toInternationalCurrencySystem_number(row.totalSupply)}
+              </span>
+              <span className="text-xs text-gray-300">
+                {toInternationalCurrencySystem_usd(row.totalSupplyMoney)}
+              </span>
+            </>
+          ) : (
+            <>-</>
+          )}
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
           {row.can_borrow ? (

@@ -55,7 +55,7 @@ export default function Controls({
         </span>
       </div>
       {/* input field */}
-      <div className="flex items-center justify-between border border-dark-500 rounded-md bg-dark-600 h-[55px] p-3.5 pr-2 gap-3">
+      <div className="flex items-center justify-between border border-[#FF9900] rounded-md bg-dark-600 h-[55px] p-3.5 pr-2 gap-3">
         <div className="flex items-center flex-grow">
           <input
             type="number"
@@ -69,7 +69,9 @@ export default function Controls({
         <TokenBox asset={asset} action={action} />
       </div>
       {/* Slider */}
+      {/* <div className="border"> */}
       <RangeSlider value={sliderValue} onChange={handleSliderChange} action={action} />
+      {/* </div> */}
       <div className="h-[1px] bg-dark-700 -mx-[20px] mt-14" />
     </div>
   );

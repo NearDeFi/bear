@@ -21,6 +21,7 @@ import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+import { setupBTCWallet } from "btc-wallet";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
 // @ts-nocheck
@@ -151,51 +152,55 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
   } catch (error) {}
   selector = await setupWalletSelector({
     modules: [
-      setupEthereumWallets({
-        wagmiConfig,
-        web3Modal,
-        alwaysOnboardDuringSignIn: true,
-      } as any),
-      setupOKXWallet({}),
-      myNearWallet,
-      setupSender() as any,
-      setupMeteorWallet(),
-      walletConnect2,
-      setupNearMobileWallet({
-        dAppMetadata: {
-          logoUrl: "https://ref-finance-images-v2.s3.amazonaws.com/images/burrowIcon.png",
-          name: "NEAR Wallet Selector",
-        },
-      }),
-      setupHereWallet(),
-      setupNightly(),
-      setupNeth({
-        bundle: false,
-        gas: "300000000000000",
-      }),
-      setupKeypom({
-        networkId: defaultNetwork,
-        signInContractId: LOGIC_CONTRACT_NAME,
-        trialAccountSpecs: {
-          url: "/trial-accounts/ACCOUNT_ID#SECRET_KEY",
-          modalOptions: KEYPOM_OPTIONS,
-        },
-        instantSignInSpecs: {
-          url: "/#instant-url/ACCOUNT_ID#SECRET_KEY/MODULE_ID",
-        },
-      }),
-      setupLedger(),
-      setupMintbaseWallet({
-        walletUrl: "https://wallet.mintbase.xyz",
-        contractId: LOGIC_CONTRACT_NAME,
-        deprecated: false,
-      }),
-      setupBitteWallet({
-        walletUrl: "https://wallet.bitte.ai",
-        contractId: LOGIC_CONTRACT_NAME,
-        deprecated: false,
-      }),
-      setupCoin98Wallet(),
+      // setupEthereumWallets({
+      //   wagmiConfig,
+      //   web3Modal,
+      //   alwaysOnboardDuringSignIn: true,
+      // } as any),
+      // setupOKXWallet({}),
+      // myNearWallet,
+      // setupSender() as any,
+      // setupMeteorWallet(),
+      // walletConnect2,
+      // setupNearMobileWallet({
+      //   dAppMetadata: {
+      //     logoUrl: "https://ref-finance-images-v2.s3.amazonaws.com/images/burrowIcon.png",
+      //     name: "NEAR Wallet Selector",
+      //   },
+      // }),
+      // setupHereWallet(),
+      // setupNightly(),
+      // setupNeth({
+      //   bundle: false,
+      //   gas: "300000000000000",
+      // }),
+      // setupKeypom({
+      //   networkId: defaultNetwork,
+      //   signInContractId: LOGIC_CONTRACT_NAME,
+      //   trialAccountSpecs: {
+      //     url: "/trial-accounts/ACCOUNT_ID#SECRET_KEY",
+      //     modalOptions: KEYPOM_OPTIONS,
+      //   },
+      //   instantSignInSpecs: {
+      //     url: "/#instant-url/ACCOUNT_ID#SECRET_KEY/MODULE_ID",
+      //   },
+      // }),
+      // setupLedger(),
+      // setupMintbaseWallet({
+      //   walletUrl: "https://wallet.mintbase.xyz",
+      //   contractId: LOGIC_CONTRACT_NAME,
+      //   deprecated: false,
+      // }),
+      // setupBitteWallet({
+      //   walletUrl: "https://wallet.bitte.ai",
+      //   contractId: LOGIC_CONTRACT_NAME,
+      //   deprecated: false,
+      // }),
+      // setupCoin98Wallet(),
+      setupBTCWallet({
+        autoConnect: true,
+        isDev: true,
+      }) as any,
     ],
     network: {
       networkId: defaultNetwork,

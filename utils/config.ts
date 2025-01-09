@@ -46,6 +46,10 @@ export const incentiveTokens = [
   // "aurora",
 ];
 export const topTokens = ["shadow_ref_v1-4179"];
+export const NBTCTokenId = {
+  testnet: "nbtc-dev.testnet",
+  mainnet: "",
+}[defaultNetwork];
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
   let endPoint = "defaultRpc";
@@ -166,5 +170,4 @@ const getConfig = (env: string = defaultNetwork) => {
 
 export const isTestnet = getConfig(defaultNetwork).networkId === "testnet";
 export const REFV1_CONTRACT_NAME = getConfig().REF_FI_CONTRACT_ID;
-
 export default getConfig;

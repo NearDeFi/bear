@@ -9,7 +9,7 @@ import { useDegenMode } from "../../hooks/hooks";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { toggleUseAsCollateral, hideModal, showModal } from "../../redux/appSlice";
 import { isInvalid, formatWithCommas_usd } from "../../utils/uiNumber";
-import { YellowSolidSubmitButton, RedSolidSubmitButton } from "./button";
+import { YellowSolidSubmitButton, RedSolidSubmitButton, CancelButton } from "./button";
 import { getCollateralAmount } from "../../redux/selectors/getCollateralAmount";
 import { TipIcon, CloseIcon, WarnIcon, JumpTipIcon, ArrowRight } from "./svg";
 import ReactToolTip from "../ToolTip";
@@ -91,7 +91,7 @@ export const ModalTitle = ({ asset, onClose }) => {
     );
   }
   return (
-    <div className="mb-[20px]">
+    <div className="">
       <div className="flex items-center justify-between text-lg text-white">
         <div
           className={`flex items-center flex-wrap ${
@@ -100,7 +100,7 @@ export const ModalTitle = ({ asset, onClose }) => {
         >
           {actionMapTitle[action]} <span>{getSymbols()}</span>
         </div>
-        <CloseIcon onClick={onClose} />
+        {/* <CloseIcon onClick={onClose} /> */}
       </div>
     </div>
   );
@@ -268,18 +268,31 @@ export const Rates = ({ rates }) => {
   ));
 };
 
-export const SubmitButton = ({ action, disabled, onClick, loading }) => {
+export const SubmitButton = ({ action, disabled, onClick, loading, onClose }) => {
   if (action === "Borrow" || action === "Repay")
     return (
-      <RedSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
-        {loading ? <BeatLoader size={5} color="#14162B" /> : action}
-      </RedSolidSubmitButton>
+      <div className="flex items-center gap-2">
+        <CancelButton onClick={onClose}>
+          {loading ? <BeatLoader size={5} color="#FF9900" /> : "Cancel"}
+        </CancelButton>
+        <RedSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
+          {loading ? <BeatLoader size={5} color="#FF9900" /> : action}
+        </RedSolidSubmitButton>
+      </div>
     );
 
   return (
-    <YellowSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
-      {loading ? <BeatLoader size={5} color="#14162B" /> : action === "Adjust" ? "Confirm" : action}
-    </YellowSolidSubmitButton>
+    // <YellowSolidSubmitButton disabled={disabled || loading} onClick={onClick} className="border">
+    //   {loading ? <BeatLoader size={5} color="#14162B" /> : action === "Adjust" ? "Confirm" : action}
+    // </YellowSolidSubmitButton>
+    <div className="flex items-center gap-2">
+      <CancelButton onClick={onClose}>
+        {loading ? <BeatLoader size={5} color="#FF9900" /> : "Cancel"}
+      </CancelButton>
+      <RedSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
+        {loading ? <BeatLoader size={5} color="#FF9900" /> : action}
+      </RedSolidSubmitButton>
+    </div>
   );
 };
 
@@ -363,3 +376,12 @@ export function useRepayTrigger(tokenId: string, position?: string) {
     dispatch(showModal({ action: "Repay", tokenId, amount: "0", position }));
   };
 }
+
+export const Receive = ({ value }: { value: string }) => {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-gray-300">Receive Amount</span>
+      <span className="text-sm">{value}</span>
+    </div>
+  );
+};

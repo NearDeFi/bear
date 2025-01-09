@@ -3,6 +3,7 @@ import Decimal from "decimal.js";
 import { useEffect, useState, createContext, useContext, useMemo } from "react";
 import { Modal as MUIModal } from "@mui/material";
 import { twMerge } from "tailwind-merge";
+import { useBtcWalletSelector } from "btc-wallet";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
 import {
@@ -54,7 +55,7 @@ import getConfig, {
   DEFAULT_POSITION,
   lpTokenPrefix,
   STABLE_POOL_IDS,
-  incentiveTokens,
+  NBTCTokenId,
 } from "../../utils/config";
 import InterestRateChart, { LabelText } from "./interestRateChart";
 import TokenBorrowSuppliesChart from "./tokenBorrowSuppliesChart";
@@ -63,20 +64,55 @@ import { IToken } from "../../interfaces/asset";
 import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
 import { useAppDispatch } from "../../redux/hooks";
+import { useBtcAction } from "../../hooks/useBtcBalance";
+import { SatoshiIcon, BtcChainIcon, ThefaucetIcon } from "../../components/Icons/Icons";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
   const router = useRouter();
   const rows = useAvailableAssets();
+  const { account, autoConnect } = useBtcWalletSelector();
   const { id } = router.query;
+  const [updaterCounter, setUpDaterCounter] = useState(1);
+  const isNBTC = NBTCTokenId === id;
+  const btcChainDetail = useBtcAction({ updater: updaterCounter });
+  const accountId = useAccountId();
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  useEffect(() => {
+    const t = setInterval(() => {
+      setUpDaterCounter((pre) => {
+        return pre + 1;
+      });
+    }, 60000);
+    if (!id || !isNBTC) {
+      clearInterval(t);
+    }
+    return () => {
+      clearInterval(t);
+    };
+  }, [isNBTC]);
+  // connect btc wallet to get btc balance;
+  useEffect(() => {
+    if (accountId && isNBTC && selectedWalletId === "btc-wallet" && !account) {
+      autoConnect();
+    }
+  }, [isNBTC, account, accountId, selectedWalletId]);
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
   if (!tokenRow) return null;
-  return <TokenDetailView tokenRow={tokenRow} assets={rows} />;
+  return <TokenDetailView tokenRow={tokenRow} assets={rows} btcChainDetail={btcChainDetail} />;
 };
 
-function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAsset[] }) {
+function TokenDetailView({
+  tokenRow,
+  assets,
+  btcChainDetail,
+}: {
+  tokenRow: UIAsset;
+  assets: UIAsset[];
+  btcChainDetail: any;
+}) {
   const [suppliers_number, set_suppliers_number] = useState<number>();
   const [borrowers_number, set_borrowers_number] = useState<number>();
   const isMobile = isMobileDevice();
@@ -235,6 +271,7 @@ function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAs
         assets,
         getIcons,
         getSymbols,
+        btcChainDetail,
       }}
     >
       {isMobile ? (
@@ -400,7 +437,7 @@ function MarketInfo({ className, tokenDetails, handlePeriodClick }) {
 }
 
 function YourInfo({ className }) {
-  const { supplied, borrowed, tokenRow } = useContext(DetailData) as any;
+  const { tokenRow } = useContext(DetailData) as any;
   return (
     <div className={`${className}`}>
       <TokenUserInfo />
@@ -415,7 +452,7 @@ function DetailPc({ tokenDetails, handlePeriodClick }) {
   const { router, supplied, borrowed, tokenRow } = useContext(DetailData) as any;
 
   return (
-    <LayoutBox>
+    <LayoutBox className="px-12 pt-8 bg-[#14161F]">
       <div
         className="inline-flex items-center cursor-pointer mb-8"
         onClick={() => {
@@ -725,7 +762,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   const apy = format_apy(depositAPY);
 
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
       <div className="font-bold text-lg text-white mb-5">Supply Info</div>
       {/* only pc */}
       <div className="flex items-stretch xsm:hidden">
@@ -800,7 +837,7 @@ function TokenBorrowChart({ tokenDetails, handlePeriodClick }) {
   const value_value = toInternationalCurrencySystem_usd(tokenRow?.totalBorrowedMoney);
   const apy = format_apy(borrowAPY);
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
       <div className="font-bold text-lg text-white mb-5">Borrow Info</div>
       {/* only pc */}
       <div className="flex items-stretch xsm:hidden">
@@ -852,7 +889,7 @@ function TokenRateModeChart({
   // const { borrowRate, supplyRate } = fullRateDetail || {};
 
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
       <div className="font-bold text-lg text-white mb-5">Interest Rate Mode</div>
 
       <div className="grid grid-cols-1 gap-y-4 mb-6 hidden xsm2:block">
@@ -883,14 +920,18 @@ function TokenRateModeChart({
 }
 
 function TokenUserInfo() {
-  const { tokenRow } = useContext(DetailData) as any;
+  const { tokenRow, btcChainDetail } = useContext(DetailData) as any;
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const accountId = useAccountId();
   const isWrappedNear = tokenRow.symbol === "NEAR";
-  const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
+  const { supplyBalance, maxBorrowAmountPositions, btcSupplyBalance } = useUserBalance(
+    tokenId,
+    isWrappedNear,
+  );
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
+  const isBtc = tokenId === NBTCTokenId;
   function getIcons() {
     return (
       <div className="flex items-center justify-center flex-wrap flex-shrink-0">
@@ -920,20 +961,73 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
+  const isNBTC = NBTCTokenId === tokenId;
+
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
-      <span className="text-lg text-white font-bold">Your Info</span>
-      <div className="flex items-center justify-between my-[25px]">
-        <span className="text-sm text-gray-300">Available to Supply</span>
-        <div className="flex items-center]">
-          <span className="text-sm text-white mr-2.5">
-            {accountId ? formatWithCommas_number(supplyBalance) : "-"}
+      <div className="flex justify-between items-center">
+        <span className="text-lg text-white font-bold">Your Info</span>
+        {isNBTC ? (
+          <span className="flex items-center">
+            <span
+              className="text-gray-300 text-xs hover:cursor-pointer underline mr-[4px]"
+              onClick={() => {
+                window.open("https://faucet.bitvmcn.xyz/", "_blank");
+              }}
+            >
+              Claim WBTC
+            </span>
+            <ThefaucetIcon />
           </span>
-          <LPTokenCell asset={tokenRow} balance={supplyBalance}>
-            {getIcons()}
-          </LPTokenCell>
-        </div>
+        ) : null}
       </div>
+      {!isNBTC ? (
+        <div className="flex items-center justify-between my-[25px]">
+          <span className="text-sm text-gray-300">Available to Supply</span>
+          <div className="flex items-center]">
+            <span className="text-sm text-white mr-2.5">
+              {accountId ? formatWithCommas_number(supplyBalance) : "-"}
+            </span>
+            <LPTokenCell asset={tokenRow} balance={supplyBalance}>
+              {getIcons()}
+            </LPTokenCell>
+          </div>
+        </div>
+      ) : (
+        <div className="my-[25px]">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-300">Available to Supply</span>
+            <span className="flex items-center">
+              <span
+                className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"
+                onClick={() => {
+                  window.open("https://testnet.bridge.satos.network/", "_blank");
+                }}
+              >
+                BTC Bridge
+              </span>
+              <SatoshiIcon />
+            </span>
+          </div>
+          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+            <span className="text-gray-300">NEAR Chain</span>
+            <span className="flex items-center">
+              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
+              <BtcChainIcon />
+            </span>
+          </div>
+          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+            <span className="text-gray-300">BTC Chain</span>
+            <span className="flex items-center">
+              <span className="mr-[6px] text-sm">
+                {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"}
+              </span>
+              <BtcChainIcon />
+            </span>
+          </div>
+        </div>
+      )}
+
       <div
         className={`flex justify-between ${
           !isLpToken && accountId && tokenRow?.can_borrow ? "items-start" : "items-center "
@@ -974,7 +1068,7 @@ function TokenUserInfo() {
         {accountId ? (
           <>
             <YellowSolidButton
-              disabled={!+supplyBalance}
+              disabled={isBtc ? !+btcSupplyBalance : !+supplyBalance}
               className="w-1 flex-grow"
               onClick={handleSupplyClick}
             >
@@ -983,7 +1077,7 @@ function TokenUserInfo() {
             {tokenRow?.can_borrow && (
               <RedSolidButton
                 disabled={!+totalBorrowAmount}
-                className="w-1 flex-grow"
+                className="w-1 flex-grow text-black"
                 onClick={() => {
                   handleBorrowClick();
                   dispatch(updatePosition({ position: DEFAULT_POSITION }));
@@ -1390,7 +1484,7 @@ function OuterLink() {
 
 function Box({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`px-7 py-5 border border-dark-50 rounded-md bg-gray-800 ${className}`}>
+    <div className={`px-7 py-5 border border-dark-50 rounded-md bg-black ${className}`}>
       {children}
     </div>
   );
@@ -1405,7 +1499,7 @@ function UserBox({
 }) {
   return (
     <div
-      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-gray-800 ${className}`}
+      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-black ${className}`}
     >
       {children}
     </div>
@@ -1486,6 +1580,7 @@ function LabelMobile({
     </div>
   );
 }
+
 function LabelMobileAPY({ tokenRow, title }) {
   return (
     <div className="flex items-center justify-between">
