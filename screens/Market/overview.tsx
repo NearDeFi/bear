@@ -39,7 +39,7 @@ function MarketsOverviewPc() {
   ) as any;
   return (
     <div className="flex items-center w-full h-[100px] rounded-xl mb-8 px-5">
-      <div className="flex flex-col items-center col-span-1 z-[1]">
+      <div className="flex flex-col items-start col-span-1 z-[1]">
           <span className="text-sm text-gray-300">Available Liquidity</span>
           <span className="text-white font-bold text-[32px] flex">
             {dollarSvg}

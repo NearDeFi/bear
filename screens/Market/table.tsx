@@ -401,14 +401,14 @@ function TableRowPc({
   return (
     <Link key={row.tokenId} href={`/tokenDetail/${row.tokenId}`}>
       <div
-        className={`grid grid-cols-6 hover:bg-black hover:border hover:border-primary rounded-md cursor-pointer mt-0.5 h-[60px] ${
+        className={`grid grid-cols-6 box-border border border-transparent hover:bg-black hover:border hover:border-primary rounded-md cursor-pointer mt-0.5 h-[60px] ${
           lastRow ? "rounded-b-md" : ""
         }`}
       >
-        <div className="relative col-span-1 flex items-center justify-self-start pl-5">
+        <div className="relative col-span-1 flex items-center justify-self-start">
           {getIcons()}
           <div className="flex flex-col items-start ml-3">
-            <div className="flex items-end">{getSymbols()}</div>
+            <div className="flex items-end font-semibold">{getSymbols()}</div>
             <span className="text-xs text-gray-300">{formatWithCommas_usd(row?.price)}</span>
           </div>
           {is_new ? (
@@ -441,7 +441,7 @@ function TableRowPc({
           </span> */}
           {row.can_deposit ? (
             <>
-              <span className="text-sm text-white">
+              <span className="text-sm text-white font-semibold">
                 {toInternationalCurrencySystem_number(row.totalSupply)}
               </span>
               <span className="text-xs text-gray-300">
@@ -455,7 +455,7 @@ function TableRowPc({
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
           {row.can_borrow ? (
             <>
-              <span className="text-sm text-white">
+              <span className="text-sm text-white font-semibold">
                 {toInternationalCurrencySystem_number(row.totalBorrowed)}
               </span>
               <span className="text-xs text-gray-300">
@@ -467,7 +467,7 @@ function TableRowPc({
           )}
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
-          <span className="text-sm text-white">
+          <span className="text-sm text-white font-semibold">
             {row.can_borrow ? (
               <APYCell
                 rewards={row.borrowRewards}
@@ -484,7 +484,7 @@ function TableRowPc({
         <div className="col-span-1 flex flex-col justify-center pl-4 xl:pl-8 whitespace-nowrap">
           {row.can_borrow ? (
             <>
-              <span className="text-sm text-white">
+              <span className="text-sm text-white font-semibold">
                 {toInternationalCurrencySystem_number(row.availableLiquidity)}
               </span>
               <span className="text-xs text-gray-300">

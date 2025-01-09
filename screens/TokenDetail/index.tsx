@@ -762,7 +762,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   const apy = format_apy(depositAPY);
 
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4 border border-dark-50">
       <div className="font-bold text-lg text-white mb-5">Supply Info</div>
       {/* only pc */}
       <div className="flex items-stretch xsm:hidden">
@@ -837,7 +837,7 @@ function TokenBorrowChart({ tokenDetails, handlePeriodClick }) {
   const value_value = toInternationalCurrencySystem_usd(tokenRow?.totalBorrowedMoney);
   const apy = format_apy(borrowAPY);
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4 border border-dark-50">
       <div className="font-bold text-lg text-white mb-5">Borrow Info</div>
       {/* only pc */}
       <div className="flex items-stretch xsm:hidden">
@@ -886,10 +886,9 @@ function TokenRateModeChart({
 }) {
   const { currentUtilRate } = interestRates?.[0] || {};
   const { borrowApy, supplyApy } = tokenRow || {};
-  // const { borrowRate, supplyRate } = fullRateDetail || {};
 
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4 border border-dark-50">
       <div className="font-bold text-lg text-white mb-5">Interest Rate Mode</div>
 
       <div className="grid grid-cols-1 gap-y-4 mb-6 hidden xsm2:block">
