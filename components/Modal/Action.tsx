@@ -22,7 +22,14 @@ import { expandToken, shrinkToken } from "../../store";
 import { getAssets as getAssetSelector } from "../../redux/assetsSelectors";
 import { getAccountPortfolio, getAccountId } from "../../redux/accountSelectors";
 
-export default function Action({ maxBorrowAmount, healthFactor, collateralType, poolAsset, onClose }) {
+// @ts-ignore
+export default function Action({
+  maxBorrowAmount,
+  healthFactor,
+  collateralType,
+  poolAsset,
+  onClose,
+}) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
   const { enable_pyth_oracle } = useAppSelector(getConfig);
@@ -102,8 +109,11 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
           amount,
           isMax,
           enable_pyth_oracle,
+          // @ts-ignore
           assets: assets.data,
+          // @ts-ignorez
           accountPortfolio,
+          // @ts-ignore
           accountId,
         });
         break;
