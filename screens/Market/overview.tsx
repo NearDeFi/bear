@@ -64,7 +64,7 @@ function MarketsOverviewPc() {
             {toInternationalCurrencySystem_usd(protocolBorrowed)}
           </span>
         </div>
-        <div className="absolute top-2 right-[-15vw] z-[0]">
+        <div className="absolute top-2 right-[-15vw] z-[0] w-[50vw]">
           <ClippedImage className="w-[50vw] top-[75px]" image="svg/Nodepattern.svg" />
         </div>
     </div>
