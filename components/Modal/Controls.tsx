@@ -55,7 +55,7 @@ export default function Controls({
         </span>
       </div>
       {/* input field */}
-      <div className="flex items-center justify-between border border-[#FF9900] rounded-md bg-dark-600 h-[55px] p-3.5 pr-2 gap-3">
+      <div className="flex items-center justify-between border border-[#FF9900] rounded-md bg-[#0A0C14] h-[55px] p-3.5 pr-2 gap-3">
         <div className="flex items-center flex-grow">
           <input
             type="number"

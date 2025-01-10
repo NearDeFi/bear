@@ -36,7 +36,7 @@ function Button({ appearanceClass, children, disabled, className, ...rest }: IBu
       {...rest}
       type="button"
       disabled={disabled}
-      className={`h-[42px] rounded-md text-base font-bold px-6 hover:opacity-80 outline-none ${
+      className={`h-[42px] rounded-md text-base font-semibold px-6 hover:opacity-80 outline-none ${
         disabled
           ? " bg-gray-500 bg-opacity-30 text-dark-400 cursor-not-allowed"
           : `${appearanceClass}`
