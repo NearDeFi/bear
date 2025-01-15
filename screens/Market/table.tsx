@@ -63,7 +63,9 @@ function TableHead({ sorting }) {
   if (isMobile) return <HeadMobile sorting={sorting} />;
   return (
     <div className="grid grid-cols-6 h-12">
-      <div className="col-span-1 rounded-t-2xl flex items-center text-sm text-gray-300">Asset</div>
+      <div className="col-span-1 rounded-t-2xl flex items-center text-sm text-[#FFFFFF] opacity-60">
+        Asset
+      </div>
       <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-black">
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
@@ -72,7 +74,7 @@ function TableHead({ sorting }) {
           }}
         />
         <div
-          className="col-span-1 flex text-gray-300 items-center cursor-pointer whitespace-nowrap"
+          className="col-span-1 flex text-[#FFFFFF] opacity-60 items-center cursor-pointer whitespace-nowrap"
           onClick={() => {
             dispatch_sort_action("totalSupplyMoney");
           }}
@@ -80,7 +82,7 @@ function TableHead({ sorting }) {
           Total Supplied
         </div>
       </div>
-      <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-gray-300">
+      <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-[#FFFFFF] opacity-60 ">
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
           onClick={() => {
@@ -99,7 +101,7 @@ function TableHead({ sorting }) {
         </div>
       </div>
       <div
-        className="col-span-1 rounded-t-2xl flex items-center text-sm text-gray-300 cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
+        className="col-span-1 rounded-t-2xl flex items-center text-sm text-[#FFFFFF] opacity-60 cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
         onClick={() => {
           dispatch_sort_action("availableLiquidityMoney");
         }}
@@ -435,7 +437,9 @@ function TableRowPc({
           {getIcons()}
           <div className="flex flex-col items-start ml-3">
             <div className="flex items-end font-semibold">{getSymbols()}</div>
-            <span className="text-xs text-gray-300">{formatWithCommas_usd(row?.price)}</span>
+            <span className="text-xs text-white opacity-40">
+              {formatWithCommas_usd(row?.price)}
+            </span>
           </div>
           {is_new ? (
             <NewTagIcon
@@ -470,7 +474,7 @@ function TableRowPc({
               <span className="text-sm text-white font-semibold">
                 {toInternationalCurrencySystem_number(row.totalSupply)}
               </span>
-              <span className="text-xs text-gray-300">
+              <span className="text-xs text-white opacity-40">
                 {toInternationalCurrencySystem_usd(row.totalSupplyMoney)}
               </span>
             </>
@@ -484,7 +488,7 @@ function TableRowPc({
               <span className="text-sm text-white font-semibold">
                 {toInternationalCurrencySystem_number(row.totalBorrowed)}
               </span>
-              <span className="text-xs text-gray-300">
+              <span className="text-xs text-white opacity-40">
                 {toInternationalCurrencySystem_usd(row.totalBorrowedMoney)}
               </span>
             </>
@@ -513,7 +517,7 @@ function TableRowPc({
               <span className="text-sm text-white font-semibold">
                 {toInternationalCurrencySystem_number(row.availableLiquidity)}
               </span>
-              <span className="text-xs text-gray-300">
+              <span className="text-xs text-white opacity-40">
                 {toInternationalCurrencySystem_usd(row.availableLiquidityMoney)}
               </span>
             </>
