@@ -1,6 +1,7 @@
 import { styled } from "@mui/material/styles";
 import { Toolbar, Link, MenuItem } from "@mui/material";
 import { display } from "@mui/system";
+// import "@fontsource/figtree"; // If using fontsource package
 
 export const Wrapper = styled("div")(({ theme }) => ({
   display: "flex", // Enable flex layout
@@ -36,7 +37,7 @@ export const Menu = styled("div")(({ theme }) => ({
 
 export const LinkStyled = styled(Link)(({ theme }) => ({
   color: "white",
-  // fontFamily: "Figtree",
+  fontFamily: "Figtree, sans-serif",
   textDecoration: "none",
   textAlign: "center",
   fontSize: "16px",

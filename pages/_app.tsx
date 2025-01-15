@@ -29,6 +29,10 @@ import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
 import { getAssets } from "../redux/assetsSelectors";
 import { getConfig } from "../redux/appSelectors";
 import { get_blocked } from "../api/get-blocked";
+import "@fontsource/figtree/400.css"; // Regular weight
+import "@fontsource/figtree/500.css"; // Medium weight
+import "@fontsource/figtree/600.css"; // Semi-bold weight
+import "@fontsource/figtree/700.css"; // Bold weight
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -128,8 +132,8 @@ function Upgrade({ Component, pageProps }) {
   return (
     <div>
       {upgrading ? (
-          <div className="flex flex-col items-center justify-center  h-screen">
-            <img src="/loading-brrr.gif" alt="" width="75px" />
+        <div className="flex flex-col items-center justify-center  h-screen">
+          <img src="/loading-brrr.gif" alt="" width="75px" />
           <span className="flex items-center text-sm text-gray-300 mt-2">
             Refreshing assets data...
           </span>
