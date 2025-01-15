@@ -36,6 +36,7 @@ export const Menu = styled("div")(({ theme }) => ({
 
 export const LinkStyled = styled(Link)(({ theme }) => ({
   color: "white",
+  // fontFamily: "Figtree",
   textDecoration: "none",
   textAlign: "center",
   fontSize: "16px",

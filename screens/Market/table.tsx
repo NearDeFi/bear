@@ -23,6 +23,11 @@ import {
 import { APYCell } from "./APYCell";
 import getConfig, { incentiveTokens, topTokens, NBTCTokenId } from "../../utils/config";
 
+const NBTC_ICON = "/svg/ntbc.svg";
+const WBTC_ICON = "/svg/wbtc.svg";
+const USDC_ICON = "/svg/usdc.svg";
+const USDT_ICON = "/svg/usdt.svg";
+
 function MarketsTable({ rows, sorting }: TableProps) {
   const allowedTokenIds = [
     "wbtc.ft.ref-labs.testnet",
@@ -58,11 +63,8 @@ function TableHead({ sorting }) {
   if (isMobile) return <HeadMobile sorting={sorting} />;
   return (
     <div className="grid grid-cols-6 h-12">
-      <div className="col-span-1 rounded-t-2xl flex items-center text-sm text-gray-300">
-        Asset
-      </div>
+      <div className="col-span-1 rounded-t-2xl flex items-center text-sm text-gray-300">Asset</div>
       <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-black">
-
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
           onClick={() => {
@@ -297,28 +299,56 @@ function TableRow({
   }, [Object.keys(borrowApyMap).length]);
   const is_native = NATIVE_TOKENS?.includes(row.tokenId);
   const is_new = NEW_TOKENS?.includes(row.tokenId);
+  // function getIcons() {
+  //   const { isLpToken, tokens } = row;
+  //   return (
+  //     <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+  //       {isLpToken ? (
+  //         tokens.map((token: IToken, index) => {
+  //           return (
+  //             <img
+  //               key={token.token_id}
+  //               src={token.metadata?.icon}
+  //               alt=""
+  //               className={`w-[20px] h-[20px] rounded-full relative ${
+  //                 index !== 0 && index !== 2 ? "-ml-1.5" : ""
+  //               } ${index > 1 ? "-mt-1.5" : "z-10"}`}
+  //             />
+  //           );
+  //         })
+  //       ) : (
+  //         <img src={row.icon} alt="" className="w-[26px] h-[26px] rounded-full" />
+  //       )}
+  //     </div>
+  //   );
+  // }
   function getIcons() {
-    const { isLpToken, tokens } = row;
-    return (
-      <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
-        {isLpToken ? (
-          tokens.map((token: IToken, index) => {
-            return (
-              <img
-                key={token.token_id}
-                src={token.metadata?.icon}
-                alt=""
-                className={`w-[20px] h-[20px] rounded-full relative ${
-                  index !== 0 && index !== 2 ? "-ml-1.5" : ""
-                } ${index > 1 ? "-mt-1.5" : "z-10"}`}
-              />
-            );
-          })
-        ) : (
-          <img src={row.icon} alt="" className="w-[26px] h-[26px] rounded-full" />
-        )}
-      </div>
-    );
+    if (row.symbol === "NBTC") {
+      return (
+        <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+          <img src={NBTC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
+        </div>
+      );
+    } else if (row.symbol === "b-WBTC") {
+      return (
+        <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+          <img src={WBTC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
+        </div>
+      );
+    } else if (row.symbol === "b-USDC") {
+      return (
+        <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+          <img src={USDC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
+        </div>
+      );
+    } else if (row.symbol === "b-USDt") {
+      return (
+        <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+          <img src={USDT_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
+        </div>
+      );
+    }
+    return null;
   }
   function getSymbols() {
     const { isLpToken, tokens } = row;

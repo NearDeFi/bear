@@ -272,9 +272,7 @@ export const SubmitButton = ({ action, disabled, onClick, loading, onClose }) =>
   if (action === "Borrow" || action === "Repay")
     return (
       <div className="flex items-center gap-2">
-        <CancelButton onClick={onClose}>
-          {loading ? <BeatLoader size={5} color="#FF9900" /> : "Cancel"}
-        </CancelButton>
+        <CancelButton onClick={onClose}>Cancel</CancelButton>
         <RedSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
           {loading ? <BeatLoader size={5} color="#FF9900" /> : action}
         </RedSolidSubmitButton>
@@ -282,13 +280,8 @@ export const SubmitButton = ({ action, disabled, onClick, loading, onClose }) =>
     );
 
   return (
-    // <YellowSolidSubmitButton disabled={disabled || loading} onClick={onClick} className="border">
-    //   {loading ? <BeatLoader size={5} color="#14162B" /> : action === "Adjust" ? "Confirm" : action}
-    // </YellowSolidSubmitButton>
     <div className="flex items-center gap-2">
-      <CancelButton onClick={onClose}>
-        {loading ? <BeatLoader size={5} color="#FF9900" /> : "Cancel"}
-      </CancelButton>
+      <CancelButton onClick={onClose}>Cancel</CancelButton>
       <RedSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
         {loading ? <BeatLoader size={5} color="#FF9900" /> : action}
       </RedSolidSubmitButton>

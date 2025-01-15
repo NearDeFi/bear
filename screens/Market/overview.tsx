@@ -1,10 +1,12 @@
-import Decimal from "decimal.js";
 import { createContext, useContext } from "react";
+import Image from "next/image";
 import { toInternationalCurrencySystem_usd, formatWithCommas_usd } from "../../utils/uiNumber";
 import { useProtocolNetLiquidity } from "../../hooks/useNetLiquidity";
 import { useRewards } from "../../hooks/useRewards";
 import { isMobileDevice } from "../../helpers/helpers";
-import ClippedImage from "../../components/ClippedImage/ClippedImage";
+// import HeaderPattern from "../../public/svg/HeaderPattern.svg";
+
+const HeaderPattern = "/svg/HeaderPattern.svg";
 
 const dollarSvg = (
   <svg width="23" height="48" viewBox="0 0 23 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -41,10 +43,10 @@ function MarketsOverviewPc() {
     MarketOverviewData,
   ) as any;
   return (
-    <div className="flex items-center w-full h-[100px] rounded-xl mb-8 px-5">
+    <div className="flex items-center w-full h-[150px] rounded-xl mb-8 px-5">
       <div className="flex flex-col items-start col-span-1 z-[1]">
         <span className="text-sm text-gray-300">Available Liquidity</span>
-        <span className="text-white font-bold text-[32px] flex">
+        <span className="text-white items-center font-bold text-[40px] flex">
           {dollarSvg}
           {toInternationalCurrencySystem_usd(protocolNetLiquidity)}
         </span>
@@ -52,7 +54,7 @@ function MarketsOverviewPc() {
       <div style={{ borderLeft: "1px solid #565874", height: "80%", margin: "0 70px 0 70px" }} />
       <div className="flex flex-col items-start col-span-1 ">
         <span className="text-sm text-gray-300">Total Supplied</span>
-        <span className="text-white font-bold  justify-center text-[32px] flex">
+        <span className="text-white items-center font-bold  justify-center text-[40px] flex">
           {dollarSvg}
           {toInternationalCurrencySystem_usd(protocolDeposited)}
         </span>
@@ -60,13 +62,13 @@ function MarketsOverviewPc() {
       <div style={{ borderLeft: "1px solid #565874", height: "80%", margin: "0 70px 0 70px" }} />
       <div className="flex flex-col items-start col-span-1">
         <span className="text-sm text-gray-300">Total Borrowed</span>
-        <span className="text-white justify-center font-bold text-[32px] flex">
+        <span className="text-white items-center justify-center font-bold text-[40px] flex">
           {dollarSvg}
           {toInternationalCurrencySystem_usd(protocolBorrowed)}
         </span>
       </div>
-      <div className="absolute top-2 right-[-15vw] z-[0] w-[50vw]">
-        <ClippedImage className="w-[50vw] top-[75px]" image="svg/Nodepattern.svg" />
+      <div className="absolute right-0 top-11">
+        <Image src={HeaderPattern} alt="pattern" width={420} height={210} priority />
       </div>
     </div>
   );
