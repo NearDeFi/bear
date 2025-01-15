@@ -70,9 +70,7 @@ function TableHead({ sorting }) {
           onClick={() => {
             dispatch_sort_action("depositApy");
           }}
-        >
-          {/* Supply APY <SortButton sort={getCurColumnSort("depositApy")} /> */}
-        </div>
+        />
         <div
           className="col-span-1 flex text-gray-300 items-center cursor-pointer whitespace-nowrap"
           onClick={() => {
@@ -80,7 +78,6 @@ function TableHead({ sorting }) {
           }}
         >
           Total Supplied
-          <SortButton sort={getCurColumnSort("totalSupplyMoney")} />
         </div>
       </div>
       <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-gray-300">
@@ -90,7 +87,7 @@ function TableHead({ sorting }) {
             dispatch_sort_action("totalBorrowedMoney");
           }}
         >
-          Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowedMoney")} />
+          Total Borrowed
         </div>
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
@@ -98,7 +95,7 @@ function TableHead({ sorting }) {
             dispatch_sort_action("borrowApy");
           }}
         >
-          Borrow APY <SortButton sort={getCurColumnSort("borrowApy")} />
+          Borrow APY
         </div>
       </div>
       <div
@@ -108,7 +105,6 @@ function TableHead({ sorting }) {
         }}
       >
         Available Liquidity
-        <SortButton sort={getCurColumnSort("availableLiquidityMoney")} />
       </div>
     </div>
   );
