@@ -43,6 +43,7 @@ export const LinkStyled = styled(Link)(({ theme }) => ({
   fontSize: "16px",
   lineHeight: 1.75,
   letterSpacing: "0.02857rem",
+  fontWeight: 500,
   paddingTop: 4,
   paddingBottom: 4,
   cursor: "pointer",
