@@ -30,7 +30,7 @@ const USDT_ICON = "/svg/usdt.svg";
 
 function MarketsTable({ rows, sorting }: TableProps) {
   const allowedTokenIds = [
-    "wbtc.ft.ref-labs.testnet",
+    // "wbtc.ft.ref-labs.testnet",
     NBTCTokenId,
     "eth.ft.ref-labs.testnet",
     "usdcc.ft.ref-labs.testnet",
@@ -368,7 +368,7 @@ function TableRow({
           })
         ) : (
           <span className="text-sm text-white xsm:text-base">
-            {row.symbol}
+            {row.symbol === "NBTC" ? "BTC" : row.symbol}
             {is_native ? (
               <span
                 style={{ zoom: 0.85 }}

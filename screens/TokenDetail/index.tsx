@@ -66,6 +66,7 @@ import AvailableBorrowCell from "./AvailableBorrowCell";
 import { useAppDispatch } from "../../redux/hooks";
 import { useBtcAction } from "../../hooks/useBtcBalance";
 import { SatoshiIcon, BtcChainIcon, ThefaucetIcon } from "../../components/Icons/Icons";
+import { BTCLogo } from "../../public/svg/btcLogo";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
@@ -968,7 +969,7 @@ function TokenUserInfo() {
         <span className="text-lg text-white font-bold">Your Info</span>
         {isNBTC ? (
           <span className="flex items-center">
-            <span
+            {/* <span
               className="text-gray-300 text-xs hover:cursor-pointer underline mr-[4px]"
               onClick={() => {
                 window.open("https://faucet.bitvmcn.xyz/", "_blank");
@@ -976,7 +977,7 @@ function TokenUserInfo() {
             >
               Claim WBTC
             </span>
-            <ThefaucetIcon />
+            <ThefaucetIcon /> */}
           </span>
         ) : null}
       </div>
@@ -997,33 +998,34 @@ function TokenUserInfo() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-300">Available to Supply</span>
             <span className="flex items-center">
-              <span
+              {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"}
+              <img src="/svg/btcLogo.svg" alt="BTC" className="w-5 h-5 ml-2" />
+              {/* <span
                 className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"
                 onClick={() => {
                   window.open("https://testnet.bridge.satos.network/", "_blank");
                 }}
               >
-                BTC Bridge
+                BTC Balance
               </span>
-              <SatoshiIcon />
+              <SatoshiIcon /> */}
             </span>
           </div>
-          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+          {/* <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
             <span className="text-gray-300">NEAR Chain</span>
             <span className="flex items-center">
               <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
               <BtcChainIcon />
             </span>
-          </div>
-          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+          </div> */}
+          {/* <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
             <span className="text-gray-300">BTC Chain</span>
             <span className="flex items-center">
               <span className="mr-[6px] text-sm">
-                {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"}
               </span>
               <BtcChainIcon />
             </span>
-          </div>
+          </div> */}
         </div>
       )}
 
@@ -1054,9 +1056,7 @@ function TokenUserInfo() {
               </div>
             ) : (
               <div className="flex items-center">
-                <span className="text-sm text-white mr-2.5">
-                  {accountId && tokenRow?.can_borrow ? "0" : "-"}
-                </span>
+                <span className="text-white">{accountId && tokenRow?.can_borrow ? "0" : "-"}</span>
                 <img src={tokenRow?.icon} className="w-5 h-5 rounded-full" alt="" />
               </div>
             )}

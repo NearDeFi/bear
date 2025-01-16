@@ -25,6 +25,7 @@ const AvailableBorrowCell = ({
     return `LP token (${symbols})`;
     // return symbols;
   }
+  console.log("asset", asset);
   return (
     <HtmlTooltip
       open={showTooltip}
@@ -44,10 +45,14 @@ const AvailableBorrowCell = ({
           setShowTooltip(!showTooltip);
         }}
       >
-        <span className="text-sm text-white mr-2.5 border-b border-dashed border-dark-800">
+        <span className="text-white border-b border-dashed border-dark-800">
           {digitalProcess(borrowData?.[1], 2)}
         </span>
-        <img src={asset?.icon} className="w-5 h-5 rounded-full" alt="" />
+        {asset.symbol === "NBTC" ? (
+          <img src="/svg/btcLogo.svg" alt="BTC" className="w-5 h-5 ml-2" />
+        ) : (
+          <img src={asset?.icon} className="w-5 h-5 rounded-full ml-2" alt="" />
+        )}
       </div>
     </HtmlTooltip>
   );
