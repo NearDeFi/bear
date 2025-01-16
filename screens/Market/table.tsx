@@ -23,7 +23,7 @@ import {
 import { APYCell } from "./APYCell";
 import getConfig, { incentiveTokens, topTokens, NBTCTokenId } from "../../utils/config";
 
-const NBTC_ICON = "/svg/ntbc.svg";
+const NBTC_ICON = "/svg/btcLogo.svg";
 const WBTC_ICON = "/svg/wbtc.svg";
 const USDC_ICON = "/svg/usdc.svg";
 const USDT_ICON = "/svg/usdt.svg";
