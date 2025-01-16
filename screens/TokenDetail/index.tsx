@@ -183,6 +183,14 @@ function TokenDetailView({
   const is_new = NEW_TOKENS?.includes(tokenRow.tokenId);
   function getIcons() {
     const { isLpToken, tokens } = tokenRow;
+
+    if (tokenRow.symbol === "NBTC") {
+      return (
+        <div className="flex items-center justify-center flex-wrap flex-shrink-0 xsm:w-[34px]">
+          <img src="/svg/btcLogo.svg" alt="BTC" className="w-10 h-10" />
+        </div>
+      );
+    }
     return (
       <div className="flex items-center justify-center flex-wrap flex-shrink-0 xsm:w-[34px]">
         {isLpToken ? (
@@ -241,7 +249,7 @@ function TokenDetailView({
           })
         ) : (
           <span className="text-[26px] text-white font-bold xsm:text-xl">
-            {tokenRow?.symbol}
+            {tokenRow?.symbol === "NBTC" ? "BTC" : tokenRow?.symbol}
             {is_native ? (
               <span
                 style={{ zoom: 0.85 }}
