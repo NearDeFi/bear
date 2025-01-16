@@ -25,7 +25,6 @@ const AvailableBorrowCell = ({
     return `LP token (${symbols})`;
     // return symbols;
   }
-  console.log("asset", asset);
   return (
     <HtmlTooltip
       open={showTooltip}
