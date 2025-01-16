@@ -65,8 +65,6 @@ import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
 import { useAppDispatch } from "../../redux/hooks";
 import { useBtcAction } from "../../hooks/useBtcBalance";
-import { SatoshiIcon, BtcChainIcon, ThefaucetIcon } from "../../components/Icons/Icons";
-import { BTCLogo } from "../../public/svg/btcLogo";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
