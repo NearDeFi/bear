@@ -18,7 +18,7 @@ export async function supply({
   useAsCollateral: boolean;
   amount: string;
   isMax: boolean;
-}): Promise<void> {
+}): Promise<boolean> {
   const { account, logicContract } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
@@ -43,20 +43,18 @@ export async function supply({
     ],
   };
 
-  // await prepareAndExecuteTokenTransactions(tokenContract, {
-  //   methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
-  //   args: {
-  //     receiver_id: logicContract.contractId,
-  //     amount: expandedAmount.toFixed(0),
-  //     msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
-  //   },
-  // });
-  await executeBTCDepositAndAction({
-    action: {
-      receiver_id: logicContract.contractId,
-      amount: expandedAmount.toFixed(0),
-      msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
-    },
-    isDev: true,
-  });
+  try {
+    await executeBTCDepositAndAction({
+      action: {
+        receiver_id: logicContract.contractId,
+        amount: expandedAmount.toFixed(0),
+        msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
+      },
+      isDev: true,
+    });
+  } catch (error) {
+    throw error;
+  }
+
+  return true;
 }

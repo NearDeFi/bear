@@ -27,6 +27,8 @@ export default function Action({
   collateralType,
   poolAsset,
   onClose,
+  setFailure,
+  setSuccess,
 }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
@@ -87,17 +89,37 @@ export default function Action({
             isRegistered: !!shadowRecords?.[pool_id],
           });
         } else {
-          await supply({
-            tokenId,
-            extraDecimals,
-            useAsCollateral,
-            amount,
-            isMax,
-          });
+          try {
+            const result = await supply({
+              tokenId,
+              extraDecimals,
+              useAsCollateral,
+              amount,
+              isMax,
+            });
+            if (result) {
+              setSuccess(true);
+            }
+          } catch (error) {
+            setFailure(true);
+          }
         }
         break;
       case "Borrow": {
-        await borrow({ tokenId, extraDecimals, amount, collateralType, enable_pyth_oracle });
+        try {
+          const result = await borrow({
+            tokenId,
+            extraDecimals,
+            amount,
+            collateralType,
+            enable_pyth_oracle,
+          });
+          if (result) {
+            setSuccess(true);
+          }
+        } catch (error) {
+          setFailure(true);
+        }
         break;
       }
       case "Withdraw": {
@@ -173,7 +195,7 @@ export default function Action({
       default:
         break;
     }
-    dispatch(hideModal());
+    setLoading(false);
   };
   const actionDisabled = useMemo(() => {
     if (action === "Supply" && +amount > 0) return false;
