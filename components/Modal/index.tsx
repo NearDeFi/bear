@@ -43,8 +43,8 @@ export const ModalContext = createContext(null) as any;
 const Modal = () => {
   const isOpen = useAppSelector(getModalStatus);
   const accountId = useAppSelector(getAccountId);
-  const [failure, setFailure] = useState(true);
-  const [success, setSuccess] = useState(true);
+  const [failure, setFailure] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const asset = useAppSelector(getAssetData);
   const { amount } = useAppSelector(getSelectedValues);
