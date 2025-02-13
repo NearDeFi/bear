@@ -63,7 +63,6 @@ export const NBTCTokenId = {
   testnet: "nbtc-dev.testnet",
   mainnet: "nbtc.bridge.near",
 }[defaultNetwork];
-export const NBTC_ENV = "mainnet";
 export const MARGIN_WHITELIST = [
   "lini.near",
   "juaner.near",
@@ -191,7 +190,6 @@ export const MARGIN_WHITELIST = [
   "refinternn.near",
   "willagao.near",
   "web3hedge.near",
-  "71b85bee14a52c42ce331d2b7ee789da4c542d72678cedcab0c762b43e28f244",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
@@ -298,6 +296,8 @@ const getConfig = (env: string = defaultNetwork) => {
       throw Error(`Unconfigured environment '${env}'. Can be configured in src/config.js.`);
   }
 };
+
+export const NBTC_ENV = "private_mainnet";
 
 export const isTestnet = getConfig(defaultNetwork).networkId === "testnet";
 
