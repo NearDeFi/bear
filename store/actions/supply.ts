@@ -21,7 +21,7 @@ export async function supply({
   amount: string;
   isMax: boolean;
   isMeme: boolean;
-}): Promise<void> {
+}): Promise<boolean | void> {
   const { account, logicContract, logicMEMEContract, hideModal, selector } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
@@ -59,7 +59,8 @@ export async function supply({
         registerDeposit: "100000000000000000000000",
       });
     } catch (error) {
-      if (hideModal) hideModal();
+      throw error;
+      // if (hideModal) hideModal();
     }
   } else {
     await prepareAndExecuteTokenTransactions(tokenContract, {
@@ -71,4 +72,5 @@ export async function supply({
       },
     });
   }
+  return true;
 }

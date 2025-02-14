@@ -24,9 +24,8 @@ import { useDegenMode } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
-import { getAssets as getAssetSelector } from "../../redux/assetsSelectors";
-import { getAccountPortfolio, getAccountId } from "../../redux/accountSelectors";
 
+// @ts-ignore
 export default function Action({
   maxBorrowAmount,
   healthFactor,
@@ -34,6 +33,9 @@ export default function Action({
   poolAsset,
   isDisabled,
   maxWithdrawAmount,
+  onClose,
+  setFailure,
+  setSuccess,
 }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
@@ -100,18 +102,39 @@ export default function Action({
             isRegistered: !!shadowRecords?.[pool_id],
           });
         } else {
-          await supply({
-            tokenId,
-            extraDecimals,
-            useAsCollateral,
-            amount,
-            isMax,
-            isMeme,
-          });
+          try {
+            const result = await supply({
+              tokenId,
+              extraDecimals,
+              useAsCollateral,
+              amount,
+              isMax,
+              isMeme,
+            });
+            if (result) {
+              setSuccess(true);
+            }
+          } catch (error) {
+            setFailure(true);
+          }
         }
         break;
       case "Borrow": {
-        await borrow({ tokenId, extraDecimals, amount, collateralType, isMeme });
+        try {
+          const result = await borrow({
+            tokenId,
+            extraDecimals,
+            amount,
+            collateralType,
+            enable_pyth_oracle,
+            isMeme
+          });
+          if (result) {
+            setSuccess(true);
+          }
+        } catch (error) {
+          setFailure(true);
+        }
         break;
       }
       case "Withdraw": {
@@ -122,6 +145,13 @@ export default function Action({
           isMax,
           isMeme,
           available,
+          enable_pyth_oracle,
+          // @ts-ignore
+          assets: assets.data,
+          // @ts-ignore
+          accountPortfolio,
+          // @ts-ignore
+          accountId,
         });
         break;
       }
@@ -186,6 +216,7 @@ export default function Action({
     }
     dispatch(hideModal());
     dispatch(hideModalMEME());
+    setLoading(false);
   };
   const actionDisabled = useMemo(() => {
     if (action === "Supply" && +amount > 0) return false;
@@ -206,6 +237,7 @@ export default function Action({
       disabled={actionDisabled || isDisabled}
       loading={loading}
       onClick={handleActionButtonClick}
+      onClose={onClose}
     />
   );
 }

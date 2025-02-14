@@ -300,5 +300,4 @@ const getConfig = (env: string = defaultNetwork) => {
 export const NBTC_ENV = "private_mainnet";
 
 export const isTestnet = getConfig(defaultNetwork).networkId === "testnet";
-
 export default getConfig;

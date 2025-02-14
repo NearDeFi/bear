@@ -142,7 +142,14 @@ const TokenDetail = () => {
     return search.get("pageType");
   }
   if (!tokenRow || !match) return null;
-  return <TokenDetailView tokenRow={tokenRow} assets={rows} isMeme={isMeme} />;
+  return (
+    <TokenDetailView
+      tokenRow={tokenRow}
+      assets={rows}
+      isMeme={isMeme}
+      btcChainDetail={btcChainDetail}
+    />
+  );
 };
 
 function TokenDetailView({
@@ -223,6 +230,14 @@ function TokenDetailView({
   const is_new = NEW_TOKENS?.includes(tokenRow.tokenId);
   function getIcons() {
     const { isLpToken, tokens } = tokenRow;
+
+    if (tokenRow.symbol === "NBTC") {
+      return (
+        <div className="flex items-center justify-center flex-wrap flex-shrink-0 xsm:w-[34px]">
+          <img src="/svg/btcLogo.svg" alt="BTC" className="w-10 h-10" />
+        </div>
+      );
+    }
     return (
       <div className="flex items-center justify-center flex-wrap flex-shrink-0 xsm:w-[34px]">
         {isLpToken ? (
@@ -281,7 +296,7 @@ function TokenDetailView({
           })
         ) : (
           <span className="text-[26px] text-white font-bold xsm:text-xl">
-            {tokenRow?.symbol}
+            {tokenRow?.symbol === "NBTC" ? "BTC" : tokenRow?.symbol}
             {is_native ? (
               <span
                 style={{ zoom: 0.85 }}
@@ -313,6 +328,7 @@ function TokenDetailView({
         getIcons,
         getSymbols,
         isMeme,
+        btcChainDetail,
       }}
     >
       {isMobile ? (
@@ -478,7 +494,7 @@ function MarketInfo({ className, tokenDetails, handlePeriodClick }) {
 }
 
 function YourInfo({ className }) {
-  const { supplied, borrowed, tokenRow } = useContext(DetailData) as any;
+  const { tokenRow } = useContext(DetailData) as any;
   return (
     <div className={`${className}`}>
       <TokenUserInfo />
@@ -493,7 +509,7 @@ function DetailPc({ tokenDetails, handlePeriodClick }) {
   const { router, supplied, borrowed, tokenRow } = useContext(DetailData) as any;
 
   return (
-    <LayoutBox>
+    <LayoutBox className="px-12 pt-8 bg-[#14161F]">
       <div
         className="inline-flex items-center cursor-pointer mb-8"
         onClick={() => {
@@ -806,7 +822,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   const apy = format_apy(depositAPY);
 
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4 border border-dark-50">
       <div className="font-bold text-lg text-white mb-5">Supply Info</div>
       {/* only pc */}
       <div className="flex items-stretch xsm:hidden">
@@ -882,7 +898,7 @@ function TokenBorrowChart({ tokenDetails, handlePeriodClick }) {
   const value_value = toInternationalCurrencySystem_usd(tokenRow?.totalBorrowedMoney);
   const apy = format_apy(borrowAPY);
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4 border border-dark-50">
       <div className="font-bold text-lg text-white mb-5">Borrow Info</div>
       {/* only pc */}
       <div className="flex items-stretch xsm:hidden">
@@ -931,10 +947,9 @@ function TokenRateModeChart({
 }) {
   const { currentUtilRate } = interestRates?.[0] || {};
   const { borrowApy, supplyApy } = tokenRow || {};
-  // const { borrowRate, supplyRate } = fullRateDetail || {};
 
   return (
-    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
+    <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-black xsm:p-4 border border-dark-50">
       <div className="font-bold text-lg text-white mb-5">Interest Rate Mode</div>
 
       <div className="grid grid-cols-1 gap-y-4 mb-6 hidden xsm2:block">
@@ -974,7 +989,10 @@ function TokenUserInfo() {
   const accountId = useAccountId();
   const isMeme = useAppSelector(isMemeCategory);
   const isWrappedNear = tokenRow.symbol === "NEAR";
-  const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
+  const { supplyBalance, maxBorrowAmountPositions, btcSupplyBalance } = useUserBalance(
+    tokenId,
+    isWrappedNear,
+  );
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
@@ -1011,13 +1029,15 @@ function TokenUserInfo() {
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
   const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
+  const isNBTC = NBTCTokenId === tokenId;
+
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <div className="flex justify-between items-center">
         <span className="text-lg text-white font-bold">Your Info</span>
         {isNBTC ? (
           <span className="flex items-center">
-            <span
+            {/* <span
               className="text-gray-300 text-xs hover:cursor-pointer underline mr-[4px]"
               onClick={() => {
                 window.open("https://faucet.bitvmcn.xyz/", "_blank");
@@ -1025,7 +1045,7 @@ function TokenUserInfo() {
             >
               Claim WBTC
             </span>
-            <ThefaucetIcon />
+            <ThefaucetIcon /> */}
           </span>
         ) : null}
       </div>
@@ -1046,15 +1066,17 @@ function TokenUserInfo() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-300">Available to Supply</span>
             <span className="flex items-center">
-              <span
+              {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"}
+              <img src="/svg/btcLogo.svg" alt="BTC" className="w-5 h-5 ml-2" />
+              {/* <span
                 className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"
                 onClick={() => {
-                  window.open("https://ramp.satos.network/", "_blank");
+                  window.open("https://testnet.bridge.satos.network/", "_blank");
                 }}
               >
-                BTC Bridge
+                BTC Balance
               </span>
-              <SatoshiIcon />
+              <SatoshiIcon /> */}
             </span>
           </div>
           {/* <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
@@ -1064,17 +1086,17 @@ function TokenUserInfo() {
               <BtcChainIcon />
             </span>
           </div> */}
-          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+          {/* <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
             <span className="text-gray-300">BTC Chain</span>
             <span className="flex items-center">
               <span className="mr-[6px] text-sm">
-                {accountId ? digitalProcess(btcAvailableBalance || 0, 8) : "-"}
               </span>
               <BtcChainIcon />
             </span>
-          </div>
+          </div> */}
         </div>
       )}
+
       <div
         className={`flex justify-between ${
           !isLpToken && accountId && tokenRow?.can_borrow ? "items-start" : "items-center "
@@ -1102,9 +1124,7 @@ function TokenUserInfo() {
               </div>
             ) : (
               <div className="flex items-center">
-                <span className="text-sm text-white mr-2.5">
-                  {accountId && tokenRow?.can_borrow ? "0" : "-"}
-                </span>
+                <span className="text-white">{accountId && tokenRow?.can_borrow ? "0" : "-"}</span>
                 <img src={tokenRow?.icon} className="w-5 h-5 rounded-full" alt="" />
               </div>
             )}
@@ -1124,7 +1144,7 @@ function TokenUserInfo() {
             {tokenRow?.can_borrow && (
               <RedSolidButton
                 disabled={!+totalBorrowAmount}
-                className="w-1 flex-grow"
+                className="w-1 flex-grow text-black"
                 onClick={() => {
                   handleBorrowClick();
                   if (isMeme) {
@@ -1519,7 +1539,7 @@ function OuterLink() {
 
 function Box({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`px-7 py-5 border border-dark-50 rounded-md bg-gray-800 ${className}`}>
+    <div className={`px-7 py-5 border border-dark-50 rounded-md bg-black ${className}`}>
       {children}
     </div>
   );
@@ -1534,7 +1554,7 @@ function UserBox({
 }) {
   return (
     <div
-      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-gray-800 ${className}`}
+      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-black ${className}`}
     >
       {children}
     </div>

@@ -78,7 +78,8 @@ module.exports = {
         sm: "6px",
       },
       colors: {
-        primary: "#D2FF3A",
+        // primary: "#D2FF3A",
+        primary: "#FF9900",
         claim: "#7C89FF",
         warning: "#FFC34F",
         danger: "#FF68A7",
@@ -115,7 +116,7 @@ module.exports = {
           1250: "#727591",
         },
         red: {
-          50: "#FF6BA9",
+          50: "#FF9900",
           100: "#FF68A7",
           150: "#EA3F68",
         },

@@ -176,7 +176,7 @@ const WalletButton = () => {
             onClick={onWalletButtonClick}
             disableRipple={!!accountId}
           >
-            Connect Wallet
+            Connect
           </Button>
         )}
         <Disclaimer isOpen={isDisclaimerOpen} onClose={() => setDisclaimer(false)} />

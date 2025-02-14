@@ -21,14 +21,27 @@ import {
   formatWithCommas_usd,
 } from "../../utils/uiNumber";
 import { APYCell } from "./APYCell";
-import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
-import { beautifyPrice } from "../../utils/beautyNumber";
+import getConfig, { incentiveTokens, topTokens, NBTCTokenId } from "../../utils/config";
 
-function MarketsTable({ rows, sorting, isMeme }: TableProps) {
+const NBTC_ICON = "/svg/btcLogo.svg";
+const WBTC_ICON = "/svg/wbtc.svg";
+const USDC_ICON = "/svg/usdc.svg";
+const USDT_ICON = "/svg/usdt.svg";
+
+function MarketsTable({ rows, sorting }: TableProps) {
+  const allowedTokenIds = [
+    // "wbtc.ft.ref-labs.testnet",
+    NBTCTokenId,
+    "eth.ft.ref-labs.testnet",
+    "usdcc.ft.ref-labs.testnet",
+    "usdtt.ft.ref-labs.testnet",
+    "frax.ft.ref-labs.testnet",
+  ];
+  const filteredRows = rows.filter((row) => allowedTokenIds.includes(row.tokenId));
   return (
     <div className="w-full xsm:p-4">
       <TableHead sorting={sorting} />
-      <TableBody rows={rows} sorting={sorting} isMeme={isMeme} />
+      <TableBody rows={filteredRows} sorting={sorting} />
     </div>
   );
 }
@@ -49,30 +62,27 @@ function TableHead({ sorting }) {
   }
   if (isMobile) return <HeadMobile sorting={sorting} />;
   return (
-    <div className="grid grid-cols-6 h-12 border border-dark-50">
-      <div className="col-span-1 bg-gray-800  flex items-center pl-5 text-sm text-gray-300 sans-bold">
-        Market
+    <div className="grid grid-cols-6 h-12">
+      <div className="col-span-1 rounded-t-2xl flex items-center text-sm text-[#FFFFFF] opacity-60">
+        Asset
       </div>
-      <div className="grid grid-cols-2 col-span-2 text-primary items-center text-sm bg-gray-800">
-        <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
-          onClick={() => {
-            dispatch_sort_action("totalSupplyMoney");
-          }}
-        >
-          Total Supplied
-          <SortButton sort={getCurColumnSort("totalSupplyMoney")} color="primary" />
-        </div>
+      <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-black">
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
             dispatch_sort_action("depositApy");
           }}
+        />
+        <div
+          className="col-span-1 flex text-[#FFFFFF] opacity-60 items-center cursor-pointer whitespace-nowrap"
+          onClick={() => {
+            dispatch_sort_action("totalSupplyMoney");
+          }}
         >
-          Supply APY <SortButton sort={getCurColumnSort("depositApy")} color="primary" />
+          Total Supplied
         </div>
       </div>
-      <div className="grid grid-cols-2 col-span-2 text-red-50 items-center text-sm bg-gray-800">
+      <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-[#FFFFFF] opacity-60 ">
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
@@ -91,7 +101,7 @@ function TableHead({ sorting }) {
         </div>
       </div>
       <div
-        className="col-span-1 text-gray-300 flex items-center text-sm text-black cursor-pointer pl-4 xl:pl-8 whitespace-nowrap bg-gray-800 sans-bold"
+        className="col-span-1 rounded-t-2xl flex items-center text-sm text-[#FFFFFF] opacity-60 cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
         onClick={() => {
           dispatch_sort_action("availableLiquidityMoney");
         }}
@@ -290,28 +300,56 @@ function TableRow({
   }, [Object.keys(borrowApyMap).length]);
   const is_native = NATIVE_TOKENS?.includes(row.tokenId);
   const is_new = NEW_TOKENS?.includes(row.tokenId);
+  // function getIcons() {
+  //   const { isLpToken, tokens } = row;
+  //   return (
+  //     <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+  //       {isLpToken ? (
+  //         tokens.map((token: IToken, index) => {
+  //           return (
+  //             <img
+  //               key={token.token_id}
+  //               src={token.metadata?.icon}
+  //               alt=""
+  //               className={`w-[20px] h-[20px] rounded-full relative ${
+  //                 index !== 0 && index !== 2 ? "-ml-1.5" : ""
+  //               } ${index > 1 ? "-mt-1.5" : "z-10"}`}
+  //             />
+  //           );
+  //         })
+  //       ) : (
+  //         <img src={row.icon} alt="" className="w-[26px] h-[26px] rounded-full" />
+  //       )}
+  //     </div>
+  //   );
+  // }
   function getIcons() {
-    const { isLpToken, tokens } = row;
-    return (
-      <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
-        {isLpToken ? (
-          tokens.map((token: IToken, index) => {
-            return (
-              <img
-                key={token.token_id}
-                src={token.metadata?.icon}
-                alt=""
-                className={`w-[20px] h-[20px] rounded-full relative ${
-                  index !== 0 && index !== 2 ? "-ml-1.5" : ""
-                } ${index > 1 ? "-mt-1.5" : "z-10"}`}
-              />
-            );
-          })
-        ) : (
-          <img src={row.icon} alt="" className="w-[26px] h-[26px] rounded-full" />
-        )}
-      </div>
-    );
+    if (row.symbol === "NBTC") {
+      return (
+        <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+          <img src={NBTC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
+        </div>
+      );
+    } else if (row.symbol === "b-WBTC") {
+      return (
+        <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+          <img src={WBTC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
+        </div>
+      );
+    } else if (row.symbol === "b-USDC") {
+      return (
+        <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+          <img src={USDC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
+        </div>
+      );
+    } else if (row.symbol === "b-USDt") {
+      return (
+        <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+          <img src={USDT_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
+        </div>
+      );
+    }
+    return null;
   }
   function getSymbols() {
     const { isLpToken, tokens } = row;
@@ -333,7 +371,7 @@ function TableRow({
           })
         ) : (
           <span className="text-sm text-white xsm:text-base">
-            {row.symbol}
+            {row.symbol === "NBTC" ? "BTC" : row.symbol}
             {is_native ? (
               <span
                 style={{ zoom: 0.85 }}
@@ -401,15 +439,17 @@ function TableRowPc({
       href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
     >
       <div
-        className={`grid grid-cols-6 bg-gray-800 hover:bg-dark-100 cursor-pointer mt-0.5 h-[60px] ${
+        className={`grid grid-cols-6 box-border border border-transparent hover:bg-black hover:border hover:border-primary rounded-md cursor-pointer mt-0.5 h-[60px] ${
           lastRow ? "rounded-b-md" : ""
         }`}
       >
-        <div className="relative col-span-1 flex items-center justify-self-start pl-5">
+        <div className="relative col-span-1 flex items-center justify-self-start">
           {getIcons()}
           <div className="flex flex-col items-start ml-3">
-            <div className="flex items-end">{getSymbols()}</div>
-            <span className="text-xs text-gray-300">{beautifyPrice(row?.price, true)}</span>
+            <div className="flex items-end font-semibold">{getSymbols()}</div>
+            <span className="text-xs text-white opacity-40">
+              {formatWithCommas_usd(row?.price)}
+            </span>
           </div>
           {is_new ? (
             <NewTagIcon
@@ -420,25 +460,12 @@ function TableRowPc({
           ) : null}
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
-          {row.can_deposit ? (
-            <>
-              <span className="text-sm text-white">
-                {toInternationalCurrencySystem_number(row.totalSupply)}
-              </span>
-              <span className="text-xs text-gray-300">
-                {beautifyPrice(row.totalSupplyMoney, true)}
-              </span>
-            </>
-          ) : (
-            <>-</>
-          )}
+          {/* <span className="text-sm text-white">
+            {toInternationalCurrencySystem_number(row.totalSupply)}
+          </span> */}
         </div>
-        <div
-          className={`col-span-1 flex flex-col justify-center pl-3 ${
-            isMeme ? "xl:pl-14" : "xl:pl-7"
-          } whitespace-nowrap`}
-        >
-          <span className="flex items-center gap-2 text-sm text-white">
+        <div className="col-span-1 flex flex-col justify-center whitespace-nowrap">
+          {/* <span className="flex items-center gap-2 text-sm text-white">
             {row.can_deposit ? (
               <APYCell
                 rewards={row.depositRewards}
@@ -451,17 +478,15 @@ function TableRowPc({
             ) : (
               "-"
             )}
-            {incentiveTokens.includes(row.tokenId) && !isMeme ? <BoosterTag /> : null}
-          </span>
-        </div>
-        <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
-          {row.can_borrow ? (
+            {incentiveTokens.includes(row.tokenId) ? <BoosterTag /> : null}
+          </span> */}
+          {row.can_deposit ? (
             <>
-              <span className="text-sm text-white">
-                {toInternationalCurrencySystem_number(row.totalBorrowed)}
+              <span className="text-sm text-white font-semibold">
+                {toInternationalCurrencySystem_number(row.totalSupply)}
               </span>
-              <span className="text-xs text-gray-300">
-                {beautifyPrice(row.totalBorrowedMoney, true)}
+              <span className="text-xs text-white opacity-40">
+                {toInternationalCurrencySystem_usd(row.totalSupplyMoney)}
               </span>
             </>
           ) : (
@@ -469,7 +494,21 @@ function TableRowPc({
           )}
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
-          <span className="text-sm text-white">
+          {row.can_borrow ? (
+            <>
+              <span className="text-sm text-white font-semibold">
+                {toInternationalCurrencySystem_number(row.totalBorrowed)}
+              </span>
+              <span className="text-xs text-white opacity-40">
+                {toInternationalCurrencySystem_usd(row.totalBorrowedMoney)}
+              </span>
+            </>
+          ) : (
+            <>-</>
+          )}
+        </div>
+        <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
+          <span className="text-sm text-white font-semibold">
             {row.can_borrow ? (
               <APYCell
                 rewards={row.borrowRewards}
@@ -486,11 +525,11 @@ function TableRowPc({
         <div className="col-span-1 flex flex-col justify-center pl-4 xl:pl-8 whitespace-nowrap">
           {row.can_borrow ? (
             <>
-              <span className="text-sm text-white">
+              <span className="text-sm text-white font-semibold">
                 {toInternationalCurrencySystem_number(row.availableLiquidity)}
               </span>
-              <span className="text-xs text-gray-300">
-                {beautifyPrice(row.availableLiquidityMoney, true)}
+              <span className="text-xs text-white opacity-40">
+                {toInternationalCurrencySystem_usd(row.availableLiquidityMoney)}
               </span>
             </>
           ) : (

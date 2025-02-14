@@ -127,5 +127,11 @@ export async function borrow({
     });
   }
 
-  await prepareAndExecuteTransactions(transactions);
+  try {
+    await prepareAndExecuteTransactions(transactions);
+  } catch (error) {
+    throw error;
+  }
+
+  return true;
 }

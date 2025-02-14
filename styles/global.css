@@ -2,33 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 @import "../node_modules/ref-modal-ui/styles.css";
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
 @font-face {
-  font-family: "work-sans";
-  src: url("./work-sans/WorkSans-Regular.otf");
+  font-family: 'Figtree', sans-serif !important;
+  src: url('/fonts/figtree-regular.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: "work-sans-bold";
-  src: url("./work-sans/WorkSans-Bold.otf");
+  font-family: 'Figtree', sans-serif !important;
+  src: url('/fonts/figtree-bold.woff2') format('woff2');
 }
 
 body {
-  font-family: "work-sans";
+  font-family: 'Figtree', sans-serif !important;
   margin: 0;
   padding: 0;
   height: 100%;
   pointer-events: all !important;
-  background: #14162b;
+  background:  #14161E;
   color: #fff;
 }
 
 #__next {
-  background: #14162b;
+  /* background: #14162b; */
+  background:  #14161E;
   height: 100%;
 }
 
 .sans-bold {
-  font-family: "work-sans-bold";
+  /* font-family: "inter"; */
 }
 
 html {
@@ -503,34 +505,42 @@ input[type="range"] {
   appearance: none;
   -webkit-appearance: none;
   background: #282a42;
-  height: 10px;
+  height: 3px;
   border-radius: 6px;
-  border: 1px solid #40435a;
+  /* border: 1px solid #40435a; */
   margin: 0 auto;
   outline: none;
-  background-image: linear-gradient(#d2ff3a, #d2ff3a);
+  /* background-image: linear-gradient(#d2ff3a, #d2ff3a); */
+  background-image: linear-gradient(#FF9900, #FF9900);
+
   background-size: 0% 100%;
   background-repeat: no-repeat;
 }
 
 .redInput[type="range"] {
-  background-image: linear-gradient(#ff6ba9, #ff6ba9);
+  background-image: linear-gradient(#FF9900, #FF9900);
 }
 
 .redInput[type="range"]::-webkit-slider-thumb,
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  background-color: #d2ff3a;
+  /* background-color: #d2ff3a; */
+  /* background-color: #FF9900; */
   width: 20px;
   height: 20px;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
-  border: 3px solid #343649;
+  background-color: #14161F;
+  border: 3px solid #FF9900;
+  /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25); */
+  /* border: 3px solid #FF9900; */
+  /* border: #FF9900; */
 }
 
 .redInput[type="range"]::-webkit-slider-thumb {
-  background-color: #ff6ba9;
+  /* background-color: #FF9900; */
+  /* background-color: #14161F; */
+  /* border: 3px solid #FF9900; */
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
