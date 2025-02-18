@@ -3,18 +3,16 @@ import { useEffect, useState } from "react";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssetsCategory } from "../../redux/assetsSelectors";
+import { isMemeCategory } from "../../redux/categorySelectors";
 import { formatTokenValueWithMilify, getDateString } from "../../helpers/helpers";
 import { getLiquidations } from "../../api/get-liquidations";
 import { setUnreadLiquidation } from "../../redux/appSlice";
 import { getAccountId } from "../../redux/accountSelectors";
 
 const Liquidations = ({ isShow, setLiquidationPage }) => {
-  const dispatch = useAppDispatch();
-  const assets = useAppSelector(getAssets);
-  const accountId = useAppSelector(getAccountId);
-  const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState<{
     page?: number;
     totalPages?: number;
@@ -22,6 +20,10 @@ const Liquidations = ({ isShow, setLiquidationPage }) => {
   }>({
     page: 1,
   });
+  const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
+  const assets = useAppSelector(getAssetsCategory(isMeme));
+  const accountId = useAppSelector(getAccountId);
   useEffect(() => {
     if (isShow) {
       fetchData({
@@ -34,7 +36,13 @@ const Liquidations = ({ isShow, setLiquidationPage }) => {
   const fetchData = async ({ page }) => {
     try {
       setIsLoading(true);
-      const { liquidationData, unreadIds } = await getLiquidations(accountId, page, 10, assets);
+      const { liquidationData, unreadIds } = await getLiquidations(
+        accountId,
+        page,
+        10,
+        assets,
+        isMeme,
+      );
       let newUnreadCount = 0;
       liquidationData?.record_list?.forEach((d) => {
         if (d.isRead === false) newUnreadCount++;

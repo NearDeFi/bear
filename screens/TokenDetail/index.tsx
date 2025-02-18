@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 import { useBtcWalletSelector } from "btc-wallet";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
+import { updatePosition as updatePositionMEME } from "../../redux/appSliceMEME";
 import {
   ArrowLeft,
   SuppliedEmptyIcon,
@@ -56,6 +57,7 @@ import getConfig, {
   lpTokenPrefix,
   STABLE_POOL_IDS,
   NBTCTokenId,
+  DISABLE_WITHDRAW_ADDRESS,
 } from "../../utils/config";
 import InterestRateChart, { LabelText } from "./interestRateChart";
 import TokenBorrowSuppliesChart from "./tokenBorrowSuppliesChart";
@@ -63,20 +65,28 @@ import { useTokenDetails } from "../../hooks/useTokenDetails";
 import { IToken } from "../../interfaces/asset";
 import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
-import { useAppDispatch } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { isMemeCategory, getActiveCategory } from "../../redux/categorySelectors";
+import { setActiveCategory } from "../../redux/marginTrading";
 import { useBtcAction } from "../../hooks/useBtcBalance";
+import { SatoshiIcon, BtcChainIcon, ThefaucetIcon } from "../../components/Icons/Icons";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
+  const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
+  const activeCategory = useAppSelector(getActiveCategory);
   const router = useRouter();
   const rows = useAvailableAssets();
   const { account, autoConnect } = useBtcWalletSelector();
   const { id } = router.query;
   const [updaterCounter, setUpDaterCounter] = useState(1);
-  const isNBTC = NBTCTokenId === id;
-  const btcChainDetail = useBtcAction({ updater: updaterCounter });
+  const tokenRow = rows.find((row: UIAsset) => {
+    return row.tokenId === id;
+  });
   const accountId = useAccountId();
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = NBTCTokenId === id && selectedWalletId === "btc-wallet";
   useEffect(() => {
     const t = setInterval(() => {
       setUpDaterCounter((pre) => {
@@ -92,25 +102,64 @@ const TokenDetail = () => {
   }, [isNBTC]);
   // connect btc wallet to get btc balance;
   useEffect(() => {
-    if (accountId && isNBTC && selectedWalletId === "btc-wallet" && !account) {
+    if (accountId && isNBTC && !account) {
       autoConnect();
     }
   }, [isNBTC, account, accountId, selectedWalletId]);
-  const tokenRow = rows.find((row: UIAsset) => {
-    return row.tokenId === id;
-  });
-  if (!tokenRow) return null;
-  return <TokenDetailView tokenRow={tokenRow} assets={rows} btcChainDetail={btcChainDetail} />;
+  const pageType = getPageTypeFromUrl();
+  const match = activeCategory == pageType;
+  // update search params if no pageType on url
+  useEffect(() => {
+    if (id && !pageType) {
+      const updatedQuery = { pageType: "main" };
+      router.replace({
+        pathname: `/tokenDetail/${id}`,
+        query: updatedQuery,
+      });
+    }
+  }, [id, pageType]);
+  // update activeCategory if pageType do not match with cache
+  useEffect(() => {
+    if (pageType && activeCategory && id) {
+      if (pageType !== activeCategory) {
+        if (pageType == "meme") {
+          dispatch(setActiveCategory("meme"));
+        } else if (pageType == "main") {
+          dispatch(setActiveCategory("main"));
+        } else {
+          router.replace({
+            pathname: `/tokenDetail/${id}`,
+            query: { pageType: "main" },
+          });
+          dispatch(setActiveCategory("main"));
+        }
+      }
+    }
+  }, [activeCategory, id, pageType]);
+  function getPageTypeFromUrl() {
+    const url = new URL(window.location.href);
+    const search = new URLSearchParams(url.search);
+    return search.get("pageType");
+  }
+  if (!tokenRow || !match) return null;
+  return (
+    <TokenDetailView
+      tokenRow={tokenRow}
+      assets={rows}
+      isMeme={isMeme}
+      // btcChainDetail={btcChainDetail}
+    />
+  );
 };
 
 function TokenDetailView({
   tokenRow,
   assets,
-  btcChainDetail,
+  isMeme,
 }: {
   tokenRow: UIAsset;
   assets: UIAsset[];
-  btcChainDetail: any;
+  isMeme: boolean;
 }) {
   const [suppliers_number, set_suppliers_number] = useState<number>();
   const [borrowers_number, set_borrowers_number] = useState<number>();
@@ -158,7 +207,7 @@ function TokenDetailView({
 
   useEffect(() => {
     fetchTokenDetails(tokenRow.tokenId, 365).catch();
-    get_token_detail(tokenRow.tokenId).then((response) => {
+    get_token_detail(tokenRow.tokenId, isMeme).then((response) => {
       const { total_suppliers, total_borrowers } = response[0] || {};
       if (!isInvalid(total_suppliers)) {
         set_suppliers_number(total_suppliers);
@@ -278,7 +327,8 @@ function TokenDetailView({
         assets,
         getIcons,
         getSymbols,
-        btcChainDetail,
+        isMeme,
+        // btcChainDetail,
       }}
     >
       {isMobile ? (
@@ -516,7 +566,7 @@ function TokenOverviewMobile() {
         }
         hidden={isLpToken}
       />
-      <LabelMobileAPY title="Supply APY" tokenRow={tokenRow} />
+      <LabelMobileAPY title="Supply APY" tokenRow={tokenRow} isMeme={isMemeCategory} />
       <LabelMobile
         title="Borrow APY"
         value={!tokenRow?.can_borrow ? "-" : format_apy(tokenRow?.borrowApy)}
@@ -581,6 +631,7 @@ function TokenOverview() {
     getIcons,
     getSymbols,
     assets,
+    isMeme,
   } = useContext(DetailData) as any;
   let isLpToken = false;
   if (tokenRow?.tokenId?.indexOf(lpTokenPrefix) > -1) {
@@ -623,6 +674,7 @@ function TokenOverview() {
                   page="deposit"
                   tokenId={tokenRow.tokenId}
                   onlyMarket
+                  memeCategory={isMeme}
                 />
               </div>
             </div>
@@ -727,6 +779,7 @@ function TokenOverview() {
                   page="deposit"
                   tokenId={tokenRow.tokenId}
                   onlyMarket
+                  memeCategory={isMeme}
                 />
               </div>
             </div>
@@ -763,7 +816,7 @@ function TokenOverview() {
 
 function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   const { tokenSupplyDays, supplyAnimating } = tokenDetails || {};
-  const { tokenRow, depositAPY } = useContext(DetailData) as any;
+  const { tokenRow, depositAPY, isMeme } = useContext(DetailData) as any;
   const value = toInternationalCurrencySystem_number(tokenRow?.totalSupply);
   const value_value = toInternationalCurrencySystem_usd(tokenRow?.totalSupplyMoney);
   const apy = format_apy(depositAPY);
@@ -789,6 +842,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
               page="deposit"
               tokenId={tokenRow.tokenId}
               onlyMarket
+              memeCategory={isMeme}
             />
           </span>
         </div>
@@ -807,7 +861,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
       {/* only mobile */}
       <div className="grid grid-cols-1 gap-y-4 lg:hidden">
         <LabelMobile title="Total Supplied" value={value} subValue={value_value} subMode="space" />
-        <LabelMobileAPY title="APY" tokenRow={tokenRow} />
+        <LabelMobileAPY title="APY" tokenRow={tokenRow} isMeme={isMeme} />
         <LabelMobile
           title="Rewards/day"
           value={
@@ -926,14 +980,16 @@ function TokenRateModeChart({
 }
 
 function TokenUserInfo() {
-  const { tokenRow, btcChainDetail } = useContext(DetailData) as any;
+  const { tokenRow } = useContext(DetailData) as any;
+  const { availableBalance: btcAvailableBalance } = useBtcAction({
+    tokenId: tokenRow?.tokenId || "",
+    decimals: tokenRow?.decimals || 0,
+  });
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const accountId = useAccountId();
+  const isMeme = useAppSelector(isMemeCategory);
   const isWrappedNear = tokenRow.symbol === "NEAR";
-  const { supplyBalance, maxBorrowAmountPositions, btcSupplyBalance } = useUserBalance(
-    tokenId,
-    isWrappedNear,
-  );
+  const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
@@ -967,7 +1023,10 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
-  const isNBTC = NBTCTokenId === tokenId;
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
+  const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
+  // const isNBTC = NBTCTokenId === tokenId;
 
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
@@ -1004,7 +1063,7 @@ function TokenUserInfo() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-300">Available to Supply</span>
             <span className="flex items-center">
-              {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"}
+              {/* {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"} */}
               <img src="/svg/btcLogo.svg" alt="BTC" className="w-5 h-5 ml-2" />
               {/* <span
                 className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"
@@ -1073,7 +1132,7 @@ function TokenUserInfo() {
         {accountId ? (
           <>
             <YellowSolidButton
-              disabled={isBtc ? !+btcSupplyBalance : !+supplyBalance}
+              disabled={isTaproot || (isBtc ? !+btcAvailableBalance : !+supplyBalance)}
               className="w-1 flex-grow"
               onClick={handleSupplyClick}
             >
@@ -1085,7 +1144,11 @@ function TokenUserInfo() {
                 className="w-1 flex-grow text-black"
                 onClick={() => {
                   handleBorrowClick();
-                  dispatch(updatePosition({ position: DEFAULT_POSITION }));
+                  if (isMeme) {
+                    dispatch(updatePositionMEME({ position: DEFAULT_POSITION }));
+                  } else {
+                    dispatch(updatePosition({ position: DEFAULT_POSITION }));
+                  }
                 }}
               >
                 Borrow
@@ -1103,6 +1166,7 @@ function TokenUserInfo() {
 function YouSupplied() {
   const { tokenRow, supplied } = useContext(DetailData) as any;
   const { tokenId } = tokenRow;
+  const accountId = useAccountId();
   const [icons, totalDailyRewardsMoney] = supplied?.rewards?.reduce(
     (acc, cur) => {
       const { rewards, metadata, config, price } = cur;
@@ -1116,19 +1180,10 @@ function YouSupplied() {
     },
     [[], 0],
   ) || [[], 0];
-  const RewardsReactNode = supplied?.rewards?.length ? (
-    <div className="flex items-center">
-      {icons.map((icon, index) => {
-        return <img key={index} src={icon} className="w-4 h-4 rounded-full -ml-0.5" alt="" />;
-      })}
-      <span className="ml-2">{formatWithCommas_usd(totalDailyRewardsMoney)}</span>
-    </div>
-  ) : (
-    "-"
-  );
   const handleWithdrawClick = useWithdrawTrigger(tokenId);
   const handleAdjustClick = useAdjustTrigger(tokenId);
-  const withdraw_disabled = !supplied || !supplied?.canWithdraw;
+  const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
+  const withdraw_disabled = !supplied || !supplied?.canWithdraw || isTaproot;
   const adjust_disabled = !supplied?.canUseAsCollateral;
   const is_empty = !supplied;
   return (
@@ -1162,19 +1217,6 @@ function YouSupplied() {
               </span>
             </div>
           </div>
-          {/* <Label
-            title="Your APY"
-            content={
-              <APYCell
-                rewards={tokenRow.depositRewards}
-                baseAPY={tokenRow.supplyApy}
-                page="deposit"
-                tokenId={tokenRow.tokenId}
-                // excludeNetApy={!incentiveTokens.includes(tokenRow.tokenId)}
-              />
-            }
-          />
-          <Label title="Daily rewards" content={RewardsReactNode} /> */}
           <Label title="Collateral" content={formatWithCommas_number(supplied?.collateral)} />
           <div className="flex items-center justify-between gap-2 mt-[35px]">
             <YellowLineButton
@@ -1204,6 +1246,7 @@ function YouSupplied() {
 function YouBorrowed() {
   const { tokenRow, borrowed, borrowedLp, assets } = useContext(DetailData) as any;
   const { tokenId } = tokenRow;
+  const isMeme = useAppSelector(isMemeCategory);
   const [icons, totalDailyRewardsMoney] = borrowed?.rewards?.reduce(
     (acc, cur) => {
       const { rewards, metadata, config, price } = cur;
@@ -1326,7 +1369,11 @@ function YouBorrowed() {
                   className="w-1 flex-grow"
                   onClick={() => {
                     handleRepayClick();
-                    dispatch(updatePosition({ position }));
+                    if (isMeme) {
+                      dispatch(updatePositionMEME({ position }));
+                    } else {
+                      dispatch(updatePosition({ position }));
+                    }
                   }}
                 >
                   Repay
@@ -1585,8 +1632,7 @@ function LabelMobile({
     </div>
   );
 }
-
-function LabelMobileAPY({ tokenRow, title }) {
+function LabelMobileAPY({ tokenRow, title, isMeme }) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm text-gray-300">{title}</span>
@@ -1597,6 +1643,7 @@ function LabelMobileAPY({ tokenRow, title }) {
           page="deposit"
           tokenId={tokenRow.tokenId}
           onlyMarket
+          memeCategory={isMeme}
         />
       </span>
     </div>

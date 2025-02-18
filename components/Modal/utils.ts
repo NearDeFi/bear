@@ -123,6 +123,7 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
       data.rates = [];
       break;
     case "Repay": {
+      // TODO available
       let minRepay = "0";
       if (poolAsset?.supplied?.shares) {
         minRepay = shrinkToken(
@@ -138,6 +139,7 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
         interestChargedIn1min = new Decimal(borrowApy)
           .div(365 * 24 * 60)
           .div(100)
+          .mul(3)
           .mul(borrowed)
           .toFixed(decimals, 2);
       }

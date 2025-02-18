@@ -1,10 +1,8 @@
-import { Link, Stack, Typography } from "@mui/material";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Stat } from "./components";
 import { useUserHealth } from "../../../hooks/useUserHealth";
 import { useAverageAPY } from "../../../hooks/useAverageAPY";
-import { APY_FORMAT, USD_FORMAT } from "../../../store";
+import { APY_FORMAT } from "../../../store";
 import { useAppSelector } from "../../../redux/hooks";
 import { getAverageSupplyRewardApy } from "../../../redux/selectors/getAverageSuppliedRewardApy";
 import { getAverageBorrowedRewardApy } from "../../../redux/selectors/getAverageBorrowedRewardApy";
@@ -13,12 +11,12 @@ import { getListTokenNetRewardApy } from "../../../redux/selectors/getListTokenN
 import HtmlTooltip from "../../common/html-tooltip";
 import { format_apy } from "../../../utils/uiNumber";
 
-export const APY = () => {
-  const { netAPY, netLiquidityAPY } = useUserHealth();
+export const APY = ({ memeCategory }: { memeCategory?: boolean }) => {
+  const { netAPY, netLiquidityAPY } = useUserHealth(memeCategory);
+  const { averageSupplyApy, averageBorrowedApy } = useAverageAPY(memeCategory);
   const totalApy = netAPY + netLiquidityAPY;
   const amount = `${totalApy.toLocaleString(undefined, APY_FORMAT)}%`;
   const showLabels = netAPY !== 0 || netLiquidityAPY !== 0;
-  const { averageSupplyApy, averageBorrowedApy } = useAverageAPY();
   const apyLabels = [
     [
       {

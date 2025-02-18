@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { ArrowDownIcon } from "./svg";
 import { CheckedIcon } from "../SelectToken/svg";
 import { useAvailableAssets } from "../../hooks/hooks";

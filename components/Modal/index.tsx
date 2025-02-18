@@ -1,8 +1,15 @@
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState, createContext, useMemo } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
+
 import Decimal from "decimal.js";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { hideModal, fetchConfig, updateAmount, updatePosition } from "../../redux/appSlice";
+import {
+  hideModal as hideModalMEME,
+  fetchConfig as fetchConfigMEME,
+  updateAmount as updateAmountMEME,
+  updatePosition as updatePositionMEME,
+} from "../../redux/appSliceMEME";
 import { getModalStatus, getAssetData, getSelectedValues } from "../../redux/appSelectors";
 import { getWithdrawMaxAmount } from "../../redux/selectors/getWithdrawMaxAmount";
 import { getRepayPositions } from "../../redux/selectors/getRepayPositions";
@@ -13,6 +20,7 @@ import { recomputeHealthFactorAdjust } from "../../redux/selectors/recomputeHeal
 import { recomputeHealthFactorWithdraw } from "../../redux/selectors/recomputeHealthFactorWithdraw";
 import { recomputeHealthFactorSupply } from "../../redux/selectors/recomputeHealthFactorSupply";
 import { recomputeHealthFactorRepay } from "../../redux/selectors/recomputeHealthFactorRepay";
+import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { recomputeHealthFactorRepayFromDeposits } from "../../redux/selectors/recomputeHealthFactorRepayFromDeposits";
 import { formatWithCommas_number } from "../../utils/uiNumber";
 import { DEFAULT_POSITION, lpTokenPrefix, NBTCTokenId } from "../../utils/config";
@@ -33,23 +41,31 @@ import {
 import Controls from "./Controls";
 import Action from "./Action";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
+import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { useDegenMode } from "../../hooks/hooks";
+import { isMemeCategory } from "../../redux/categorySelectors";
+import {
+  CollateralTypeSelectorBorrow,
+  CollateralTypeSelectorRepay,
+} from "./CollateralTypeSelector";
 import { useBtcAction } from "../../hooks/useBtcBalance";
-import { CollateralTypeSelectorRepay } from "./CollateralTypeSelector";
+import { beautifyPrice } from "../../utils/beautyNumber";
 import FailureModal from "./Failure";
 import SuccessModal from "./Success";
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
+  const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
   const isOpen = useAppSelector(getModalStatus);
   const accountId = useAppSelector(getAccountId);
   const [failure, setFailure] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  console.log("isOpen", isOpen);
   const asset = useAppSelector(getAssetData);
+  const assets = useAppSelector(getAssetsCategory());
   const { amount } = useAppSelector(getSelectedValues);
-  const assets = useAppSelector((state) => state.assets?.data || {});
-  const dispatch = useAppDispatch();
   const { isRepayFromDeposits } = useDegenMode();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
@@ -73,10 +89,16 @@ const Modal = () => {
   const maxBorrowAmountPositions = useAppSelector(getBorrowMaxAmount(tokenId));
   const maxWithdrawAmount = useAppSelector(getWithdrawMaxAmount(tokenId));
   const repayPositions = useAppSelector(getRepayPositions(tokenId));
-  const { availableBalance: btcAvailableBalance, receiveAmount } = useBtcAction({
-    inputAmount: amount,
-    decimals: asset.decimals,
+  const { availableBalance: btcAvailableBalance, totalFeeAmount } = useBtcAction({
+    tokenId: asset?.tokenId || "",
+    decimals: asset?.decimals || 0,
   });
+  const receiveAmount = useMemo(() => {
+    return Decimal.max(new Decimal(amount || 0).minus(totalFeeAmount || 0), 0).toFixed(
+      asset?.decimals || 0,
+      Decimal.ROUND_DOWN,
+    );
+  }, [totalFeeAmount, amount]);
   const activePosition =
     action === "Repay" || action === "Borrow"
       ? selectedCollateralType
@@ -86,17 +108,7 @@ const Modal = () => {
   const { maxBorrowAmount = 0, maxBorrowValue = 0 } =
     maxBorrowAmountPositions[activePosition] || {};
   const repayAmount = repayPositions[selectedCollateralType];
-  const {
-    symbol,
-    apy,
-    price,
-    available,
-    available$,
-    totalTitle,
-    rates,
-    alerts,
-    canUseAsCollateral,
-  } = getModalData({
+  const { price, available, available$, rates, alerts, canUseAsCollateral } = getModalData({
     ...asset,
     maxBorrowAmount,
     maxWithdrawAmount,
@@ -107,25 +119,34 @@ const Modal = () => {
     poolAsset: assets[tokenId],
   });
   const handleClose = () => {
-    dispatch(hideModal());
+    // dispatch(hideModal());
     setFailure(false);
     setSuccess(false);
+    console.log("handleClose !!!!!!!!!!!!!!!!");
   };
-  useEffect(() => {
-    if (isOpen) {
-      dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
-      dispatch(fetchConfig());
-    }
-  }, [isOpen]);
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     // TODO33 still need this???
+  //     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
+  //     dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
+  //     dispatch(fetchConfig());
+  //     dispatch(fetchConfigMEME());
+  //   }
+  // }, [isOpen]);
   useEffect(() => {
     if (position) {
       setSelectedCollateralType(position);
     }
   }, [position]);
-  useEffect(() => {
-    dispatch(updateAmount({ isMax: false, amount: "0" }));
-    dispatch(updatePosition({ position: selectedCollateralType }));
-  }, [selectedCollateralType]);
+  // useEffect(() => {
+  //   if (isMeme) {
+  //     dispatch(updateAmountMEME({ isMax: false, amount: "0" }));
+  //     dispatch(updatePositionMEME({ position: selectedCollateralType }));
+  //   } else {
+  //     dispatch(updateAmount({ isMax: false, amount: "0" }));
+  //     dispatch(updatePosition({ position: selectedCollateralType }));
+  //   }
+  // }, [selectedCollateralType, isMeme]);
   if (action === "Adjust") {
     rates.push({
       label: "Use as Collateral",
@@ -133,8 +154,30 @@ const Modal = () => {
       value$: new Decimal(price * +amount).toFixed(),
     });
   }
+  // const handleClose = () => {
+  //   if (isMeme) {
+  //     dispatch(hideModalMEME());
+  //   } else {
+  //     dispatch(hideModal());
+  //   }
+  // };
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isBtcToken = asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
+  const isBtcSupply = action === "Supply" && isBtcToken;
+  const isBtcWithdraw = action === "Withdraw" && isBtcToken;
+  if (isBtcWithdraw) {
+    const min_withdraw_amount = 0.00005;
+    if (new Decimal(amount || 0).lt(min_withdraw_amount)) {
+      alerts["btcWithdraw"] = {
+        title: `You must withdraw at least ${min_withdraw_amount} NBTC`,
+        severity: "error",
+      };
+    } else {
+      delete alerts.btcWithdraw;
+    }
+  }
   const isBtc = action === "Supply" && asset.tokenId === NBTCTokenId;
 
   return (
@@ -229,7 +272,7 @@ const Modal = () => {
                 amount={amount}
                 available={isBtc ? btcAvailableBalance : available}
                 action={action}
-                tokenId={tokenId}
+                // tokenId={tokenId}
                 asset={asset}
                 totalAvailable={isBtc ? btcAvailableBalance : available}
                 available$={available$}
@@ -255,9 +298,11 @@ const Modal = () => {
               <Alerts data={alerts} />
               <Action
                 maxBorrowAmount={maxBorrowAmount}
+                maxWithdrawAmount={maxWithdrawAmount}
                 healthFactor={healthFactor}
                 collateralType={selectedCollateralType}
                 poolAsset={assets[tokenId]}
+                isDisabled={alerts["btcWithdraw"]}
                 onClose={handleClose}
                 setFailure={setFailure}
                 setSuccess={setSuccess}

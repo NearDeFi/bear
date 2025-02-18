@@ -11,6 +11,8 @@ import {
   toInternationalCurrencySystem_number,
 } from "../../../utils/uiNumber";
 import { ThreeDotIcon } from "../../Icons/IconsV2";
+import { useAppSelector } from "../../../redux/hooks";
+import { beautifyPrice } from "../../../utils/beautyNumber";
 
 const transformAssetReward = (r, text) => ({
   value: r.dailyAmount.toLocaleString(undefined, TOKEN_FORMAT),
@@ -21,7 +23,7 @@ const transformAssetReward = (r, text) => ({
 
 const sumRewards = (acc, r) => acc + r.dailyAmount * r.price;
 
-export const UserDailyRewards = () => {
+export const UserDailyRewards = ({ memeCategory }: { memeCategory?: boolean }) => {
   const {
     baseDepositUsdDaily,
     baseBorrowedUsdDaily,
@@ -32,18 +34,18 @@ export const UserDailyRewards = () => {
     farmTotalUsdDaily,
     totalUsdDaily,
     allRewards,
-  } = useDailyRewards();
-  useDailyRewards();
+  } = useDailyRewards(memeCategory);
+
   const rewardsLabels = [
     [
       {
-        value: toInternationalCurrencySystem_usd(baseDepositUsdDaily),
+        value: beautifyPrice(baseDepositUsdDaily, true),
         text: "Supply",
       },
     ],
     [
       {
-        value: toInternationalCurrencySystem_usd(farmTotalUsdDaily),
+        value: beautifyPrice(farmTotalUsdDaily, true),
         text: "Incentive",
       },
     ],
@@ -62,11 +64,11 @@ export const UserDailyRewards = () => {
     ],
     [
       {
-        value: `${
-          baseBorrowedUsdDaily > 0
-            ? `-${toInternationalCurrencySystem_usd(baseBorrowedUsdDaily)}`
-            : "$0"
-        }`,
+        value: (
+          <span>
+            -{baseBorrowedUsdDaily > 0 ? beautifyPrice(baseBorrowedUsdDaily, true) : "$0"}
+          </span>
+        ),
         text: "Borrow Interest",
       },
     ],
@@ -78,7 +80,7 @@ export const UserDailyRewards = () => {
         titleTooltip="Estimated daily profit"
         amount={
           <div className="flex items-center gap-2">
-            {totalUsdDaily > 0 ? totalUsdDaily.toLocaleString(undefined, USD_FORMAT) : "$0"}
+            {totalUsdDaily > 0 ? beautifyPrice(totalUsdDaily, true) : "$0"}
             <IconMore allRewards={allRewards} />
           </div>
         }
@@ -135,7 +137,7 @@ const IncentiveMore = ({
           >
             <span className="text-gray-300 font-normal">Supply Incentive</span>
             <span className="text-white font-normal">
-              {toInternationalCurrencySystem_usd(farmSuppliedUsdDaily)}
+              {beautifyPrice(farmSuppliedUsdDaily, true)}
             </span>
           </div>
           <div
@@ -145,7 +147,7 @@ const IncentiveMore = ({
           >
             <span className="text-gray-300 font-normal">Borrow Incentive</span>
             <span className="text-white font-normal">
-              {toInternationalCurrencySystem_usd(farmBorrowedUsdDaily)}
+              {beautifyPrice(farmBorrowedUsdDaily, true)}
             </span>
           </div>
           <div
@@ -155,7 +157,7 @@ const IncentiveMore = ({
           >
             <span className="text-gray-300 font-normal">Net Liquidity</span>
             <span className="text-white font-normal">
-              {toInternationalCurrencySystem_usd(farmNetTvlUsdDaily)}
+              {beautifyPrice(farmNetTvlUsdDaily, true)}
             </span>
           </div>
           <div
@@ -165,7 +167,7 @@ const IncentiveMore = ({
           >
             <span className="text-gray-300 font-normal">Net Liquidity</span>
             <span className="text-white font-normal">
-              {toInternationalCurrencySystem_usd(farmTokenNetUsdDaily)}
+              {beautifyPrice(farmTokenNetUsdDaily, true)}
             </span>
           </div>
         </div>

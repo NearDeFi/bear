@@ -1,52 +1,54 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDebounce } from "react-use";
 import Decimal from "decimal.js";
-import { useBtcWalletSelector, getBtcBalance, estimateDepositAmount } from "btc-wallet";
+import { useBtcWalletSelector, getBtcBalance, getDepositAmount } from "btc-wallet";
 import { expandToken, shrinkToken } from "../store/helper";
+import { NBTCTokenId, NBTC_ENV } from "../utils/config";
 
-export function useBtcAction({ updater, inputAmount, decimals }: any) {
+export function useBtcAction({
+  tokenId,
+  decimals,
+  updaterCounter,
+}: {
+  tokenId: string;
+  decimals: number;
+  updaterCounter?: number;
+}) {
   const [balance, setBalance] = useState<number>(0);
-  const [receiveAmount, setReceiveAmount] = useState<string>("0");
+  const [totalFeeAmount, setTotalFeeAmount] = useState<number>(0);
   const [availableBalance, setAvailableBalance] = useState<number>(0);
   const btcSelector = useBtcWalletSelector();
-  const expandInputAmount = expandToken(inputAmount || 0, decimals || 0, 0);
+  const isBtcTokenId = tokenId == NBTCTokenId;
+  const env = NBTC_ENV;
   useDebounce(
     () => {
-      if (btcSelector?.account) {
-        getBtcBalance().then((res) => {
-          const { rawBalance, balance: btcBalance, availableBalance: btcAvailableBalance } = res;
+      if (btcSelector?.account && isBtcTokenId) {
+        getBtcBalance().then(async (res) => {
+          const { balance: btcBalance, availableBalance: btcAvailableBalance } = res;
+          const expandAvailableBalance = expandToken(btcAvailableBalance, decimals);
+          const { protocolFee, repayAmount } = await getDepositAmount(expandAvailableBalance, {
+            env,
+          });
+          const totalFeeAmount = shrinkToken(
+            new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),
+            decimals,
+          );
+          const avaBalance = Decimal.max(
+            0,
+            new Decimal(btcAvailableBalance).minus(totalFeeAmount).toFixed(),
+          ).toFixed();
           setBalance(btcBalance || 0);
-          setAvailableBalance(btcAvailableBalance || 0);
-          // eslint-disable-next-line no-console
-          console.log("----------------Balance", btcBalance);
-          // eslint-disable-next-line no-console
-          console.log("----------------btcAvailableBalance", btcAvailableBalance);
+          setAvailableBalance(+(avaBalance || 0));
+          setTotalFeeAmount(+(totalFeeAmount || 0));
         });
       }
     },
     500,
-    [btcSelector?.account, updater],
+    [btcSelector?.account, updaterCounter, isBtcTokenId],
   );
-  useDebounce(
-    () => {
-      const inputAmountDecimal = new Decimal(expandInputAmount || 0);
-      if (inputAmountDecimal.lte(0)) {
-        setReceiveAmount("0");
-      } else {
-        estimateDepositAmount(expandInputAmount, { isDev: true }).then((received: string) => {
-          setReceiveAmount(shrinkToken(received || "0", decimals));
-          // eslint-disable-next-line no-console
-          console.log("---------------receivedBalance", shrinkToken(received || "0", decimals));
-        });
-      }
-    },
-    500,
-    [expandInputAmount],
-  );
-
   return {
     balance,
     availableBalance,
-    receiveAmount,
+    totalFeeAmount,
   };
 }

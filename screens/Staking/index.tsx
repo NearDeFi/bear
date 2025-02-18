@@ -1,15 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { Stack, Typography, Box, useTheme } from "@mui/material";
 import { DateTime } from "luxon";
 import styled from "styled-components";
 import { twMerge } from "tailwind-merge";
 import Decimal from "decimal.js";
-import { BrrrLogo, StakingPill, StakingCard, LiveUnclaimedAmount } from "./components";
+import { BrrrLogo } from "./components";
 import { useAppSelector } from "../../redux/hooks";
 import { getTotalBRRR } from "../../redux/selectors/getTotalBRRR";
-import { TOKEN_FORMAT } from "../../store";
 import { useStaking } from "../../hooks/useStaking";
-import { useClaimAllRewards } from "../../hooks/useClaimAllRewards";
 import { trackUnstake } from "../../utils/telemetry";
 import { unstake } from "../../store/actions/unstake";
 import { useAccountId } from "../../hooks/hooks";
@@ -31,20 +28,16 @@ import HtmlTooltip from "../../components/common/html-tooltip";
 import YourAPY from "./yourAPY";
 
 const Staking = () => {
-  const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR);
-  const accountBalances = useAppSelector((state) => state.account.balances);
-  const assets = useAppSelector(getAssets);
-  // available: ,
-  const { BRRR, stakingTimestamp, stakingNetAPY, stakingNetTvlAPY } = useStaking();
-  const [, , , multiplierStaked] = useAppSelector(getAccountBoostRatioData);
-  const { handleClaimAll, isLoading } = useClaimAllRewards("staking");
   const [loadingUnstake, setLoadingUnstake] = useState(false);
-  const [isModalOpen, openModal] = useState(false);
   const [modal, setModal] = useState<modalProps>();
   const [showTooltip, setShowTooltip] = useState(false);
   const accountId = useAccountId();
-  const theme = useTheme();
   const isMobile = isMobileDevice();
+  const [total] = useAppSelector(getTotalBRRR(false));
+  const accountBalances = useAppSelector((state) => state.account.balances);
+  const assets = useAppSelector(getAssets);
+  const [, , , multiplierStaked] = useAppSelector(getAccountBoostRatioData(false));
+  const { BRRR, stakingTimestamp } = useStaking(false);
   const unstakeDate = DateTime.fromMillis(stakingTimestamp / 1e6);
   const disabledUnstake = !BRRR || DateTime.now() < unstakeDate;
   const displayMultiplierStaked = toPrecision(
@@ -194,7 +187,7 @@ const StakingBox = ({
   disabled,
 }: StakingBoxProps) => {
   function GotoDetailPage() {
-    window.open(`/tokenDetail/${BRRR_TOKEN[defaultNetwork]}`);
+    window.open(`/tokenDetail/${BRRR_TOKEN[defaultNetwork]}?pageType=main`);
   }
   return (
     <ContentBox className="mb-4 md:w-[363px]" padding="26px">

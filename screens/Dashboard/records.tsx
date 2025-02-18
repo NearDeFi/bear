@@ -5,7 +5,8 @@ import Datasource from "../../data/datasource";
 import { useAccountId, useToastMessage } from "../../hooks/hooks";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppSelector } from "../../redux/hooks";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssetsCategory } from "../../redux/assetsSelectors";
+import { isMemeCategory } from "../../redux/categorySelectors";
 import { getDateString } from "../../helpers/helpers";
 import { nearNativeTokens, nearTokenId, standardizeAsset } from "../../utils";
 import {
@@ -16,10 +17,6 @@ import {
 } from "../../components/Icons/Icons";
 
 const Records = ({ isShow }) => {
-  const accountId = useAccountId();
-  const { toastMessage, showToast } = useToastMessage();
-  const assets = useAppSelector(getAssets);
-  const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState<any>([]);
   const [pagination, setPagination] = useState<{
     page?: number;
@@ -29,6 +26,11 @@ const Records = ({ isShow }) => {
     page: 1,
   });
   const [txLoadingStates, setTxLoadingStates] = useState({});
+  const accountId = useAccountId();
+  const { toastMessage, showToast } = useToastMessage();
+  const isMeme = useAppSelector(isMemeCategory);
+  const assets = useAppSelector(getAssetsCategory(isMeme));
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isShow) {
@@ -41,7 +43,7 @@ const Records = ({ isShow }) => {
   const fetchData = async ({ page }) => {
     try {
       setIsLoading(true);
-      const response = await Datasource.shared.getRecords(accountId, page, 10);
+      const response = await Datasource.shared.getRecords(accountId, page, 10, isMeme);
       const list = response?.record_list?.map(async (d) => {
         let tokenId = d.token_id;
         if (nearNativeTokens.includes(tokenId)) {
@@ -110,6 +112,7 @@ const Records = ({ isShow }) => {
 const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
   {
     header: "Assets",
+    minSize: 220,
     cell: ({ originalData }) => {
       const { data } = originalData || {};
       const { metadata } = data || {};
@@ -173,9 +176,11 @@ const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
   {
     header: "Type",
     accessorKey: "event",
+    maxSize: 180,
   },
   {
     header: "Amount",
+    maxSize: 180,
     cell: ({ originalData }) => {
       const { amount, data } = originalData || {};
       const { metadata, config } = data || {};

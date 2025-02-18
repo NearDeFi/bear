@@ -8,9 +8,21 @@ import { filterAccountSentOutFarms, standardizeAsset } from "../../utils/index";
 export const getListTokenNetRewardApy = () =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
-      // todo
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
       const { supplied, collateral, borrowed, farms } = account.portfolio;
       const tokenNetFarms = farms.tokennetbalance || {};
       const list = Object.entries(tokenNetFarms)

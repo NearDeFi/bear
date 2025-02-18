@@ -23,7 +23,6 @@ const AvailableBorrowCell = ({
       "",
     );
     return `LP token (${symbols})`;
-    // return symbols;
   }
   return (
     <HtmlTooltip

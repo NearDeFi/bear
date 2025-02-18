@@ -3,6 +3,10 @@ import Decimal from "decimal.js";
 import { useBtcWalletSelector } from "btc-wallet";
 import { nearTokenId } from "../../utils";
 import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
+import {
+  toggleUseAsCollateral as toggleUseAsCollateralMEME,
+  hideModal as hideModalMEME,
+} from "../../redux/appSliceMEME";
 import { getModalData } from "./utils";
 import { repay } from "../../store/actions/repay";
 import { repayFromDeposits } from "../../store/actions/repayFromDeposits";
@@ -14,6 +18,7 @@ import { shadow_action_supply } from "../../store/actions/shadow";
 import { adjustCollateral } from "../../store/actions/adjustCollateral";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getSelectedValues, getAssetData, getConfig } from "../../redux/appSelectors";
+import { isMemeCategory } from "../../redux/categorySelectors";
 import { trackActionButton } from "../../utils/telemetry";
 import { useDegenMode } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
@@ -26,22 +31,26 @@ export default function Action({
   healthFactor,
   collateralType,
   poolAsset,
+  isDisabled,
+  maxWithdrawAmount,
   onClose,
   setFailure,
   setSuccess,
 }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
-  const { enable_pyth_oracle } = useAppSelector(getConfig);
+  const { enable_pyth_oracle } = useAppSelector(getConfig); // TODO33 need query from api？
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
   const { account, autoConnect } = useBtcWalletSelector();
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
+  const isMeme = useAppSelector(isMemeCategory);
   const { available, canUseAsCollateral, extraDecimals, collateral, disabled, decimals } =
     getModalData({
       ...asset,
+      maxWithdrawAmount,
       maxBorrowAmount,
       healthFactor,
       amount,
@@ -53,7 +62,11 @@ export default function Action({
   );
   useEffect(() => {
     if (!canUseAsCollateral) {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: false }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      }
     }
   }, [useAsCollateral]);
 
@@ -76,7 +89,7 @@ export default function Action({
     switch (action) {
       case "Supply":
         if (tokenId === nearTokenId) {
-          await deposit({ amount, useAsCollateral, isMax });
+          await deposit({ amount, useAsCollateral, isMax, isMeme });
         } else if (isLpToken) {
           const shadowRecords = await getShadowRecords();
           const pool_id = tokenId.split("-")[1];
@@ -96,6 +109,7 @@ export default function Action({
               useAsCollateral,
               amount,
               isMax,
+              isMeme,
             });
             if (result) {
               setSuccess(true);
@@ -112,7 +126,7 @@ export default function Action({
             extraDecimals,
             amount,
             collateralType,
-            enable_pyth_oracle,
+            isMeme,
           });
           if (result) {
             setSuccess(true);
@@ -128,10 +142,11 @@ export default function Action({
           extraDecimals,
           amount,
           isMax,
-          enable_pyth_oracle,
+          isMeme,
+          available,
           // @ts-ignore
           assets: assets.data,
-          // @ts-ignorez
+          // @ts-ignore
           accountPortfolio,
           // @ts-ignore
           accountId,
@@ -144,7 +159,7 @@ export default function Action({
           extraDecimals,
           amount,
           isMax,
-          enable_pyth_oracle,
+          isMeme,
         });
         break;
       case "Repay": {
@@ -156,6 +171,7 @@ export default function Action({
               .div(365 * 24 * 60)
               .div(100)
               .mul(borrowed)
+              .mul(3)
               .toFixed(),
             decimals,
             0,
@@ -177,7 +193,7 @@ export default function Action({
             extraDecimals,
             position: collateralType,
             isMax,
-            enable_pyth_oracle,
+            isMeme,
           });
         } else {
           await repay({
@@ -188,6 +204,7 @@ export default function Action({
             isMax,
             minRepay,
             interestChargedIn1min,
+            isMeme,
           });
         }
         break;
@@ -195,6 +212,8 @@ export default function Action({
       default:
         break;
     }
+    // dispatch(hideModal());
+    // dispatch(hideModalMEME());
     setLoading(false);
   };
   const actionDisabled = useMemo(() => {
@@ -213,7 +232,7 @@ export default function Action({
   return (
     <SubmitButton
       action={action}
-      disabled={actionDisabled}
+      disabled={actionDisabled || isDisabled}
       loading={loading}
       onClick={handleActionButtonClick}
       onClose={onClose}

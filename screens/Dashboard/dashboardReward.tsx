@@ -1,9 +1,8 @@
-import millify from "millify";
 import { IReward } from "../../interfaces";
-import { PERCENT_DIGITS, shrinkToken } from "../../store";
-import { formatPortfolioRewardAmount } from "../../components/Table/common/cells";
+import { shrinkToken } from "../../store";
 import { formatUSDValue } from "../../helpers/helpers";
 import { standardizeAsset } from "../../utils";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 interface RewardProps {
   rewardList?: IReward[];
@@ -31,8 +30,7 @@ const DashboardReward = ({ rewardList = [], page }: RewardProps) => {
     });
   }
 
-  const usdNode =
-    totalUsd !== 0 && totalUsd < 0.01 ? `<${formatUSDValue(0.01)}` : formatUSDValue(totalUsd);
+  const usdNode = totalUsd !== 0 && beautifyPrice(totalUsd, true);
 
   return (
     <div className="flex gap-2 md:gap-0 md:flex-col px-1">

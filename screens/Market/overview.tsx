@@ -1,10 +1,11 @@
 import { createContext, useContext } from "react";
 import Image from "next/image";
+import Decimal from "decimal.js";
+
 import { toInternationalCurrencySystem_usd, formatWithCommas_usd } from "../../utils/uiNumber";
 import { useProtocolNetLiquidity } from "../../hooks/useNetLiquidity";
 import { useRewards } from "../../hooks/useRewards";
 import { isMobileDevice } from "../../helpers/helpers";
-// import HeaderPattern from "../../public/svg/HeaderPattern.svg";
 
 const HeaderPattern = "/svg/HeaderPattern.svg";
 
@@ -19,18 +20,36 @@ const dollarSvg = (
 
 const MarketOverviewData = createContext(null) as any;
 function MarketsOverview() {
-  const { protocolBorrowed, protocolDeposited, protocolNetLiquidity } = useProtocolNetLiquidity();
-  const { tokenNetBalanceRewards } = useRewards();
+  // main
+  const { protocolBorrowed, protocolDeposited, protocolNetLiquidity } = useProtocolNetLiquidity(
+    false,
+    false,
+  );
+  const { tokenNetBalanceRewards } = useRewards(false);
+  // meme
+  const {
+    protocolBorrowed: protocolBorrowedMEME,
+    protocolDeposited: protocolDepositedMEME,
+    protocolNetLiquidity: protocolNetLiquidityMEME,
+  } = useProtocolNetLiquidity(false, true);
+  const { tokenNetBalanceRewards: tokenNetBalanceRewardsMEME } = useRewards(true);
   const sumRewards = (acc, r) => acc + r.dailyAmount * r.price;
   const amount = tokenNetBalanceRewards.reduce(sumRewards, 0);
+  const amountMEME = tokenNetBalanceRewardsMEME.reduce(sumRewards, 0);
   const isMobile = isMobileDevice();
   return (
     <MarketOverviewData.Provider
       value={{
-        protocolBorrowed,
-        protocolDeposited,
-        protocolNetLiquidity,
-        amount,
+        protocolBorrowed: new Decimal(protocolBorrowed || 0)
+          .plus(protocolBorrowedMEME || 0)
+          .toFixed(),
+        protocolDeposited: new Decimal(protocolDeposited || 0)
+          .plus(protocolDepositedMEME || 0)
+          .toFixed(),
+        protocolNetLiquidity: new Decimal(protocolNetLiquidity || 0).plus(
+          protocolNetLiquidityMEME || 0,
+        ),
+        amount: new Decimal(amount || 0).plus(amountMEME || 0),
       }}
     >
       {isMobile ? <MarketsOverviewMobile /> : <MarketsOverviewPc />}

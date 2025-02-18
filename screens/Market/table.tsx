@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TableProps } from "../../components/Table";
 import {
   ArrowDownIcon,
@@ -32,16 +32,21 @@ function MarketsTable({ rows, sorting }: TableProps) {
   const allowedTokenIds = [
     // "wbtc.ft.ref-labs.testnet",
     NBTCTokenId,
-    "eth.ft.ref-labs.testnet",
-    "usdcc.ft.ref-labs.testnet",
-    "usdtt.ft.ref-labs.testnet",
-    "frax.ft.ref-labs.testnet",
+    "usdt.tether-token.near",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    // "eth.ft.ref-labs.testnet",
+    // "usdcc.ft.ref-labs.testnet",
+    // "usdtt.ft.ref-labs.testnet",
+    // "frax.ft.ref-labs.testnet",
   ];
+  // console.log("rows", rows);
   const filteredRows = rows.filter((row) => allowedTokenIds.includes(row.tokenId));
+  // const filteredRows = rows;
+  console.log("filteredRows", filteredRows);
   return (
     <div className="w-full xsm:p-4">
       <TableHead sorting={sorting} />
-      <TableBody rows={filteredRows} sorting={sorting} />
+      <TableBody rows={filteredRows} sorting={sorting} isMeme={false} />
     </div>
   );
 }
@@ -68,7 +73,7 @@ function TableHead({ sorting }) {
       </div>
       <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-black">
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
             dispatch_sort_action("depositApy");
           }}
@@ -84,20 +89,20 @@ function TableHead({ sorting }) {
       </div>
       <div className="grid grid-cols-2 col-span-2 rounded-t-2xl items-center text-sm text-[#FFFFFF] opacity-60 ">
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
             dispatch_sort_action("totalBorrowedMoney");
           }}
         >
-          Total Borrowed
+          Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowedMoney")} color="red-50" />
         </div>
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
             dispatch_sort_action("borrowApy");
           }}
         >
-          Borrow APY
+          Borrow APY <SortButton sort={getCurColumnSort("borrowApy")} color="red-50" />
         </div>
       </div>
       <div
@@ -107,6 +112,7 @@ function TableHead({ sorting }) {
         }}
       >
         Available Liquidity
+        <SortButton sort={getCurColumnSort("availableLiquidityMoney")} color="gray-300" />
       </div>
     </div>
   );
@@ -175,17 +181,16 @@ function HeadMobile({ sorting }) {
     </div>
   );
 }
-function TableBody({ rows, sorting }: TableProps) {
+function TableBody({ rows, sorting, isMeme }: TableProps) {
   const [depositApyMap, setDepositApyMap] = useState<Record<string, number>>({});
   const [borrowApyMap, setBorrowApyMap] = useState<Record<string, number>>({});
-  const [sortedRows, setSortedRows] = useState<any>();
   const { property, order } = sorting;
-  useEffect(() => {
+  const sortedRows = useMemo(() => {
     if (rows?.length) {
-      setSortedRows(rows.sort(comparator));
+      return rows.sort(comparator);
     }
   }, [rows, Object.keys(depositApyMap).length, Object.keys(borrowApyMap).length, property, order]);
-  if (!rows?.length) return null;
+  if (!sortedRows?.length) return null;
   function comparator(b: UIAsset, a: UIAsset) {
     let a_comparator_value;
     let b_comparator_value;
@@ -249,6 +254,7 @@ function TableBody({ rows, sorting }: TableProps) {
             setDepositApyMap={setDepositApyMap}
             borrowApyMap={borrowApyMap}
             setBorrowApyMap={setBorrowApyMap}
+            isMeme={isMeme}
           />
         );
       })}
@@ -263,6 +269,7 @@ function TableRow({
   setDepositApyMap,
   borrowApyMap,
   setBorrowApyMap,
+  isMeme,
 }: {
   row: UIAsset;
   lastRow: boolean;
@@ -270,6 +277,7 @@ function TableRow({
   setDepositApyMap: any;
   borrowApyMap: Record<string, number>;
   setBorrowApyMap: any;
+  isMeme: boolean;
 }) {
   const { NATIVE_TOKENS, NEW_TOKENS } = getConfig() as any;
   const isMobile = isMobileDevice();
@@ -333,13 +341,13 @@ function TableRow({
           <img src={WBTC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
         </div>
       );
-    } else if (row.symbol === "b-USDC") {
+    } else if (row.symbol === "b-USDC" || row.symbol === "USDC") {
       return (
         <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
           <img src={USDC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
         </div>
       );
-    } else if (row.symbol === "b-USDt") {
+    } else if (row.symbol === "b-USDt" || row.symbol === "USDt") {
       return (
         <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
           <img src={USDT_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
@@ -395,6 +403,7 @@ function TableRow({
           is_new={is_new}
           getIcons={getIcons}
           getSymbols={getSymbols}
+          isMeme={isMeme}
         />
       ) : (
         <TableRowPc
@@ -405,6 +414,7 @@ function TableRow({
           is_new={is_new}
           getIcons={getIcons}
           getSymbols={getSymbols}
+          isMeme={isMeme}
         />
       )}
     </div>
@@ -418,6 +428,7 @@ function TableRowPc({
   is_new,
   getIcons,
   getSymbols,
+  isMeme,
 }: {
   row: UIAsset;
   lastRow: boolean;
@@ -425,9 +436,13 @@ function TableRowPc({
   is_new: boolean;
   getIcons: () => React.ReactNode;
   getSymbols: () => React.ReactNode;
+  isMeme: boolean;
 }) {
   return (
-    <Link key={row.tokenId} href={`/tokenDetail/${row.tokenId}`}>
+    <Link
+      key={row.tokenId}
+      href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
+    >
       <div
         className={`grid grid-cols-6 box-border border border-transparent hover:bg-black hover:border hover:border-primary rounded-md cursor-pointer mt-0.5 h-[60px] ${
           lastRow ? "rounded-b-md" : ""
@@ -441,13 +456,13 @@ function TableRowPc({
               {formatWithCommas_usd(row?.price)}
             </span>
           </div>
-          {is_new ? (
+          {/* {is_new ? (
             <NewTagIcon
               className={`absolute transform -translate-x-[1px] z-20 ${
                 row.isLpToken && row.tokens.length > 2 ? "bottom-1" : "bottom-2"
               }`}
             />
-          ) : null}
+          ) : null} */}
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
           {/* <span className="text-sm text-white">
@@ -463,6 +478,7 @@ function TableRowPc({
                 page="deposit"
                 tokenId={row.tokenId}
                 onlyMarket
+                memeCategory={isMeme}
               />
             ) : (
               "-"
@@ -538,6 +554,7 @@ function TableRowMobile({
   is_new,
   getIcons,
   getSymbols,
+  isMeme,
 }: {
   row: UIAsset;
   lastRow: boolean;
@@ -547,9 +564,13 @@ function TableRowMobile({
   is_new: boolean;
   getIcons: () => React.ReactNode;
   getSymbols: () => React.ReactNode;
+  isMeme: boolean;
 }) {
   return (
-    <Link key={row.tokenId} href={`/tokenDetail/${row.tokenId}`}>
+    <Link
+      key={row.tokenId}
+      href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
+    >
       <div className={`bg-gray-800 rounded-xl p-3.5 ${lastRow ? "" : "mb-4"}`}>
         <div className="flex items-center pb-4 border-b border-dark-950 -ml-1 relative">
           {getIcons()}
@@ -572,7 +593,8 @@ function TableRowMobile({
             title="Supply APY"
             row={row}
             canShow={row.can_deposit}
-            booster={incentiveTokens.includes(row.tokenId)}
+            booster={incentiveTokens.includes(row.tokenId) && !isMeme}
+            isMeme={isMeme}
           />
           <TemplateMobile
             title="Total Borrowed"
@@ -591,17 +613,17 @@ function TableRowMobile({
               row.can_borrow ? toInternationalCurrencySystem_usd(row.availableLiquidityMoney) : ""
             }
           />
-          <TemplateMobile title="Price" value={formatWithCommas_usd(row?.price)} />
+          <TemplateMobile title="Price" value={row?.price} />
         </div>
       </div>
     </Link>
   );
 }
-function SortButton({ sort }: { sort?: "asc" | "desc" }) {
+function SortButton({ sort, color }: { sort?: "asc" | "desc"; color?: string }) {
   return (
     <div className="flex flex-col items-center gap-0.5 ml-1.5">
-      <ArrowUpIcon className={`text-black ${sort === "asc" ? "" : "text-opacity-30"}`} />
-      <ArrowDownIcon className={`text-black ${sort === "desc" ? "" : "text-opacity-30"}`} />
+      <ArrowUpIcon className={`text-${color} ${sort === "asc" ? "" : "text-opacity-30"}`} />
+      <ArrowDownIcon className={`text-${color} ${sort === "desc" ? "" : "text-opacity-30"}`} />
     </div>
   );
 }
@@ -611,7 +633,7 @@ function TemplateMobile({
   subValue,
 }: {
   title: string;
-  value: string;
+  value: string | React.ReactNode;
   subValue?: string;
 }) {
   return (
@@ -626,7 +648,7 @@ function TemplateMobile({
     </div>
   );
 }
-function TemplateMobileAPY({ title, row, canShow, booster }) {
+function TemplateMobileAPY({ title, row, canShow, booster, isMeme }) {
   return (
     <div className="flex flex-col">
       <span className="text-gray-300 text-sm">{title}</span>
@@ -638,6 +660,7 @@ function TemplateMobileAPY({ title, row, canShow, booster }) {
             page="deposit"
             tokenId={row.tokenId}
             onlyMarket
+            memeCategory={isMeme}
           />
         ) : (
           <>-</>
