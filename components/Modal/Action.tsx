@@ -126,8 +126,7 @@ export default function Action({
             extraDecimals,
             amount,
             collateralType,
-            enable_pyth_oracle,
-            isMeme
+            isMeme,
           });
           if (result) {
             setSuccess(true);
@@ -145,7 +144,6 @@ export default function Action({
           isMax,
           isMeme,
           available,
-          enable_pyth_oracle,
           // @ts-ignore
           assets: assets.data,
           // @ts-ignore
@@ -214,8 +212,8 @@ export default function Action({
       default:
         break;
     }
-    dispatch(hideModal());
-    dispatch(hideModalMEME());
+    // dispatch(hideModal());
+    // dispatch(hideModalMEME());
     setLoading(false);
   };
   const actionDisabled = useMemo(() => {

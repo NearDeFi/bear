@@ -52,10 +52,10 @@ export const executeMultipleTransactions = async (
       transactions: selectorTransactions,
     });
     if (fetchData) fetchData(account.accountId);
-    if (hideModal) hideModal();
+    // if (hideModal) hideModal();
     return result;
   } catch (e: any) {
-    if (hideModal) hideModal();
+    // if (hideModal) hideModal();
     if (/reject/.test(e)) {
       // eslint-disable-next-line no-alert
       alert("Transaction was rejected in wallet. Please try again!");

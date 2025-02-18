@@ -25,6 +25,7 @@ const Market = () => {
   };
   const loading = !rows.length;
 
+  console.log(rows);
   return (
     <LayoutBox className="flex flex-col justify-center items-center">
       <div>
@@ -37,6 +38,7 @@ const Market = () => {
             rows={rows}
             onRowClick={handleOnRowClick}
             sorting={{ name: "market", ...sorting.market, setSorting }}
+            isMeme={false}
           />
           {loading ? (
             <div className="flex flex-col items-center mt-24">

@@ -147,7 +147,7 @@ const TokenDetail = () => {
       tokenRow={tokenRow}
       assets={rows}
       isMeme={isMeme}
-      btcChainDetail={btcChainDetail}
+      // btcChainDetail={btcChainDetail}
     />
   );
 };
@@ -328,7 +328,7 @@ function TokenDetailView({
         getIcons,
         getSymbols,
         isMeme,
-        btcChainDetail,
+        // btcChainDetail,
       }}
     >
       {isMobile ? (
@@ -989,10 +989,7 @@ function TokenUserInfo() {
   const accountId = useAccountId();
   const isMeme = useAppSelector(isMemeCategory);
   const isWrappedNear = tokenRow.symbol === "NEAR";
-  const { supplyBalance, maxBorrowAmountPositions, btcSupplyBalance } = useUserBalance(
-    tokenId,
-    isWrappedNear,
-  );
+  const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
@@ -1029,7 +1026,7 @@ function TokenUserInfo() {
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
   const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
-  const isNBTC = NBTCTokenId === tokenId;
+  // const isNBTC = NBTCTokenId === tokenId;
 
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
@@ -1066,7 +1063,7 @@ function TokenUserInfo() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-300">Available to Supply</span>
             <span className="flex items-center">
-              {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"}
+              {/* {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"} */}
               <img src="/svg/btcLogo.svg" alt="BTC" className="w-5 h-5 ml-2" />
               {/* <span
                 className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"

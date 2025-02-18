@@ -62,6 +62,8 @@ export const topTokens = ["shadow_ref_v1-4179"];
 export const NBTCTokenId = {
   testnet: "nbtc-dev.testnet",
   mainnet: "nbtc.bridge.near",
+  // private_mainnet: "nbtc.toalice.near",
+  // mainnet: "nbtc.toalice.near",
 }[defaultNetwork];
 export const MARGIN_WHITELIST = [
   "lini.near",

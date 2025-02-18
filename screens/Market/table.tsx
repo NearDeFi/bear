@@ -32,16 +32,21 @@ function MarketsTable({ rows, sorting }: TableProps) {
   const allowedTokenIds = [
     // "wbtc.ft.ref-labs.testnet",
     NBTCTokenId,
-    "eth.ft.ref-labs.testnet",
-    "usdcc.ft.ref-labs.testnet",
-    "usdtt.ft.ref-labs.testnet",
-    "frax.ft.ref-labs.testnet",
+    "usdt.tether-token.near",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    // "eth.ft.ref-labs.testnet",
+    // "usdcc.ft.ref-labs.testnet",
+    // "usdtt.ft.ref-labs.testnet",
+    // "frax.ft.ref-labs.testnet",
   ];
+  // console.log("rows", rows);
   const filteredRows = rows.filter((row) => allowedTokenIds.includes(row.tokenId));
+  // const filteredRows = rows;
+  console.log("filteredRows", filteredRows);
   return (
     <div className="w-full xsm:p-4">
       <TableHead sorting={sorting} />
-      <TableBody rows={filteredRows} sorting={sorting} />
+      <TableBody rows={filteredRows} sorting={sorting} isMeme={false} />
     </div>
   );
 }
@@ -336,13 +341,13 @@ function TableRow({
           <img src={WBTC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
         </div>
       );
-    } else if (row.symbol === "b-USDC") {
+    } else if (row.symbol === "b-USDC" || row.symbol === "USDC") {
       return (
         <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
           <img src={USDC_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
         </div>
       );
-    } else if (row.symbol === "b-USDt") {
+    } else if (row.symbol === "b-USDt" || row.symbol === "USDt") {
       return (
         <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
           <img src={USDT_ICON} alt="" className="w-[33px] h-[26px] rounded-full" />
@@ -451,13 +456,13 @@ function TableRowPc({
               {formatWithCommas_usd(row?.price)}
             </span>
           </div>
-          {is_new ? (
+          {/* {is_new ? (
             <NewTagIcon
               className={`absolute transform -translate-x-[1px] z-20 ${
                 row.isLpToken && row.tokens.length > 2 ? "bottom-1" : "bottom-2"
               }`}
             />
-          ) : null}
+          ) : null} */}
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
           {/* <span className="text-sm text-white">
@@ -608,7 +613,7 @@ function TableRowMobile({
               row.can_borrow ? toInternationalCurrencySystem_usd(row.availableLiquidityMoney) : ""
             }
           />
-          <TemplateMobile title="Price" value={beautifyPrice(row?.price, true)} />
+          <TemplateMobile title="Price" value={row?.price} />
         </div>
       </div>
     </Link>

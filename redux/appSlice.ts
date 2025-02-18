@@ -145,6 +145,7 @@ export const appSlice = createSlice({
   initialState,
   reducers: {
     hideModal(state) {
+      console.log("hideModal !!!!!!!!!!!!!!!!");
       state.showModal = false;
     },
     showModal(

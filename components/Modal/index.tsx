@@ -62,6 +62,7 @@ const Modal = () => {
   const [failure, setFailure] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  console.log("isOpen", isOpen);
   const asset = useAppSelector(getAssetData);
   const assets = useAppSelector(getAssetsCategory());
   const { amount } = useAppSelector(getSelectedValues);
@@ -118,39 +119,34 @@ const Modal = () => {
     poolAsset: assets[tokenId],
   });
   const handleClose = () => {
-    dispatch(hideModal());
+    // dispatch(hideModal());
     setFailure(false);
     setSuccess(false);
-
-    if (isMeme) {
-      dispatch(hideModalMEME());
-    } else {
-      dispatch(hideModal());
-    }
+    console.log("handleClose !!!!!!!!!!!!!!!!");
   };
-  useEffect(() => {
-    if (isOpen) {
-      // TODO33 still need this???
-      dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
-      dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
-      dispatch(fetchConfig());
-      dispatch(fetchConfigMEME());
-    }
-  }, [isOpen]);
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     // TODO33 still need this???
+  //     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
+  //     dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
+  //     dispatch(fetchConfig());
+  //     dispatch(fetchConfigMEME());
+  //   }
+  // }, [isOpen]);
   useEffect(() => {
     if (position) {
       setSelectedCollateralType(position);
     }
   }, [position]);
-  useEffect(() => {
-    if (isMeme) {
-      dispatch(updateAmountMEME({ isMax: false, amount: "0" }));
-      dispatch(updatePositionMEME({ position: selectedCollateralType }));
-    } else {
-      dispatch(updateAmount({ isMax: false, amount: "0" }));
-      dispatch(updatePosition({ position: selectedCollateralType }));
-    }
-  }, [selectedCollateralType, isMeme]);
+  // useEffect(() => {
+  //   if (isMeme) {
+  //     dispatch(updateAmountMEME({ isMax: false, amount: "0" }));
+  //     dispatch(updatePositionMEME({ position: selectedCollateralType }));
+  //   } else {
+  //     dispatch(updateAmount({ isMax: false, amount: "0" }));
+  //     dispatch(updatePosition({ position: selectedCollateralType }));
+  //   }
+  // }, [selectedCollateralType, isMeme]);
   if (action === "Adjust") {
     rates.push({
       label: "Use as Collateral",

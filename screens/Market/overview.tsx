@@ -1,10 +1,11 @@
 import { createContext, useContext } from "react";
 import Image from "next/image";
+import Decimal from "decimal.js";
+
 import { toInternationalCurrencySystem_usd, formatWithCommas_usd } from "../../utils/uiNumber";
 import { useProtocolNetLiquidity } from "../../hooks/useNetLiquidity";
 import { useRewards } from "../../hooks/useRewards";
 import { isMobileDevice } from "../../helpers/helpers";
-// import HeaderPattern from "../../public/svg/HeaderPattern.svg";
 
 const HeaderPattern = "/svg/HeaderPattern.svg";
 

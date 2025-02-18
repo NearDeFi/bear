@@ -47,9 +47,13 @@ export async function supply({
     ],
   };
   const wallet = await selector.wallet();
+  let result;
+  console.log("wallet.id", wallet.id, tokenId);
   if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
+    // @ts-ignore
     try {
-      await executeBTCDepositAndAction({
+      console.log("executeBTCDepositAndAction");
+      result = executeBTCDepositAndAction({
         action: {
           receiver_id: burrowContractId,
           amount: expandedAmount.toFixed(0),
@@ -57,20 +61,30 @@ export async function supply({
         },
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
+        pollResult: true,
       });
+      console.log("result", result);
     } catch (error) {
       throw error;
       // if (hideModal) hideModal();
     }
   } else {
-    await prepareAndExecuteTokenTransactions(tokenContract, {
-      methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
-      args: {
-        receiver_id: burrowContractId,
-        amount: expandedAmount.toFixed(0),
-        msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
-      },
-    });
+    console.log("prepareAndExecuteTokenTransactions");
+    // @ts-ignore
+    try {
+      result = await prepareAndExecuteTokenTransactions(tokenContract, {
+        methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
+        args: {
+          receiver_id: burrowContractId,
+          amount: expandedAmount.toFixed(0),
+          msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
+        },
+      });
+    } catch (error) {
+      throw error;
+      // if (hideModal) hideModal();
+    }
+    console.log("result", result);
   }
   return true;
 }
